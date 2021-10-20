@@ -2,18 +2,16 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
-
 buildscript {
     apply from: '../versions.gradle'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        // jcenter()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_tools_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.novoda:bintray-release:$novoda_bintray_version"
     }
 }
 
@@ -26,6 +24,7 @@ android {
         targetSdkVersion library_target_version
         versionCode 8
         versionName "2.6"
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -50,12 +49,15 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$android_support_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid2_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxJava2_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
+
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.4.1"))
+    implementation("com.squareup.okhttp3:okhttp")              // No version!
 
     implementation project(':fetch2okhttp')
     implementation project(':fetch2rx')

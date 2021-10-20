@@ -2,18 +2,16 @@ apply plugin: 'com.android.library'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'com.novoda.bintray-release'
-
 buildscript {
     apply from: '../versions.gradle'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        // jcenter()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_tools_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.novoda:bintray-release:$novoda_bintray_version"
     }
 }
 
@@ -23,8 +21,6 @@ android {
     defaultConfig {
         minSdkVersion library_min_version
         targetSdkVersion library_target_version
-        versionCode library_version_code
-        versionName library_version
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -63,15 +59,6 @@ dependencies {
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test:runner:$test_runner_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-}
-
-publish {
-    userOrg = 'tonyofrancis'
-    groupId = 'androidx.tonyodev.fetch2rx'
-    artifactId = 'xfetch2rx'
-    publishVersion = library_version
-    desc = 'RxJava extensions for Fetch2'
-    website = 'https://github.com/tonyofrancis/fetch'
 }
 
 tasks.withType(Javadoc).all {

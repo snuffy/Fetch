@@ -6,6 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DownloadListActivity extends AppCompatActivity implements ActionListener {
@@ -74,12 +77,13 @@ public class DownloadListActivity extends AppCompatActivity implements ActionLis
         recyclerView.setAdapter(fileAdapter);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onResume() {
         super.onResume();
         fetch.getDownloadsInGroup(GROUP_ID, downloads -> {
             final ArrayList<Download> list = new ArrayList<>(downloads);
-            Collections.sort(list, (first, second) -> Long.compare(first.getCreated(), second.getCreated()));
+            Collections.sort(list, Comparator.comparingLong(Download::getCreated));
             for (Download download : list) {
                 fileAdapter.addDownload(download);
             }
