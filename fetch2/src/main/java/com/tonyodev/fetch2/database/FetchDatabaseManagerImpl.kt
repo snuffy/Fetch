@@ -17,13 +17,15 @@ import com.tonyodev.fetch2core.Extras
 import com.tonyodev.fetch2core.Logger
 
 
-class FetchDatabaseManagerImpl constructor(context: Context,
-                                           private val namespace: String,
-                                           override val logger: Logger,
-                                           migrations: Array<Migration>,
-                                           private val liveSettings: LiveSettings,
-                                           private val fileExistChecksEnabled: Boolean,
-                                           private val defaultStorageResolver: DefaultStorageResolver) : FetchDatabaseManager<DownloadInfo> {
+class FetchDatabaseManagerImpl constructor(
+    context: Context,
+    private val namespace: String,
+    override val logger: Logger,
+    migrations: Array<Migration>,
+    private val liveSettings: LiveSettings,
+    private val fileExistChecksEnabled: Boolean,
+    private val defaultStorageResolver: DefaultStorageResolver
+) : FetchDatabaseManager<DownloadInfo> {
 
     @Volatile
     private var closed = false
@@ -87,17 +89,18 @@ class FetchDatabaseManagerImpl constructor(context: Context,
         try {
             database.beginTransaction()
 
-            database.execSQL("UPDATE ${DownloadDatabase.TABLE_NAME} SET "
-                    + "${DownloadDatabase.COLUMN_DOWNLOADED} = ?, "
-                    + "${DownloadDatabase.COLUMN_TOTAL} = ?, "
-                    + "${DownloadDatabase.COLUMN_STATUS} = ? "
-                    + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
-                    arrayOf(
-                            downloadInfo.downloaded,
-                            downloadInfo.total,
-                            downloadInfo.status.value,
-                            downloadInfo.id
-                    )
+            database.execSQL(
+                "UPDATE ${DownloadDatabase.TABLE_NAME} SET "
+                        + "${DownloadDatabase.COLUMN_DOWNLOADED} = ?, "
+                        + "${DownloadDatabase.COLUMN_TOTAL} = ?, "
+                        + "${DownloadDatabase.COLUMN_STATUS} = ? "
+                        + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
+                arrayOf(
+                    downloadInfo.downloaded,
+                    downloadInfo.total,
+                    downloadInfo.status.value,
+                    downloadInfo.id
+                )
             )
             database.setTransactionSuccessful()
         } catch (e: SQLiteException) {
@@ -112,15 +115,11 @@ class FetchDatabaseManagerImpl constructor(context: Context,
 
     override fun updateExtras(id: Int, extras: Extras): DownloadInfo? {
         throwExceptionIfClosed()
-        database.beginTransaction()
-        database.execSQL("UPDATE ${DownloadDatabase.TABLE_NAME} SET "
-                + "${DownloadDatabase.COLUMN_EXTRAS} = '?' "
-                + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
-                arrayOf(extras.toJSONString(), id)
-        )
-        database.setTransactionSuccessful()
-        database.endTransaction()
         val download = requestDatabase.requestDao().get(id)
+        download?.let {
+            it.extras = extras
+            requestDatabase.requestDao().update(it)
+        }
         sanitize(download)
         return download
     }
@@ -178,7 +177,10 @@ class FetchDatabaseManagerImpl constructor(context: Context,
         return downloads
     }
 
-    override fun getDownloadsInGroupWithStatus(groupId: Int, statuses: List<Status>): List<DownloadInfo> {
+    override fun getDownloadsInGroupWithStatus(
+        groupId: Int,
+        statuses: List<Status>
+    ): List<DownloadInfo> {
         throwExceptionIfClosed()
         var downloads = requestDatabase.requestDao().getByGroupWithStatus(groupId, statuses)
         if (sanitize(downloads)) {
@@ -221,18 +223,21 @@ class FetchDatabaseManagerImpl constructor(context: Context,
         return downloads
     }
 
-    private val pendingCountQuery = "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
-            " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
-            " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'"
+    private val pendingCountQuery =
+        "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
+                " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
+                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'"
 
-    private val pendingCountIncludeAddedQuery = "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
-            " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
-            " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'" +
-            " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.ADDED.value}'"
+    private val pendingCountIncludeAddedQuery =
+        "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
+                " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
+                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'" +
+                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.ADDED.value}'"
 
     override fun getPendingCount(includeAddedDownloads: Boolean): Long {
         return try {
-            val query = if (includeAddedDownloads) pendingCountIncludeAddedQuery else pendingCountQuery
+            val query =
+                if (includeAddedDownloads) pendingCountIncludeAddedQuery else pendingCountQuery
             val cursor: Cursor? = database.query(query)
             val count = cursor?.count?.toLong() ?: -1L
             cursor?.close()
@@ -301,11 +306,12 @@ class FetchDatabaseManagerImpl constructor(context: Context,
 
     private fun onDownloading(downloadInfo: DownloadInfo, firstEntry: Boolean) {
         if (firstEntry) {
-            val status = if (downloadInfo.downloaded > 0 && downloadInfo.total > 0 && downloadInfo.downloaded >= downloadInfo.total) {
-                Status.COMPLETED
-            } else {
-                Status.QUEUED
-            }
+            val status =
+                if (downloadInfo.downloaded > 0 && downloadInfo.total > 0 && downloadInfo.downloaded >= downloadInfo.total) {
+                    Status.COMPLETED
+                } else {
+                    Status.QUEUED
+                }
             downloadInfo.status = status
             downloadInfo.error = defaultNoError
             updatedDownloadsList.add(downloadInfo)
