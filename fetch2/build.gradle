@@ -1,15 +1,14 @@
 apply plugin: 'com.android.library'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-kapt'
-
-//apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven-publish'
 
 buildscript {
     apply from: '../versions.gradle'
+
     repositories {
         google()
+        maven { url "https://jitpack.io" }
         mavenCentral()
         // jcenter()
     }
@@ -49,8 +48,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     sourceSets {
@@ -74,4 +73,39 @@ dependencies {
 
 tasks.withType(Javadoc).all {
     enabled = false
+}
+
+//publishing {
+//    publications {
+//        release(MavenPublication) {
+//            // Specify own groupId as package name of your library,
+//            // otherwise it would just use project's name (=name of the root directory) by default.
+//            groupId 'com.tonyodev.fetch2'
+//
+//            // Specify custom artifactId if needed,
+//            // otherwise it would use module's name by default.
+//            artifactId 'fetch2'
+//
+//            // You can specify custom version,
+//            // otherwise it would use version from `android { defaultConfig { ... } }` by default.
+//            version = '3.1.6'
+//        }
+//    }
+//}
+
+//simple settings
+project.afterEvaluate {
+    publishing {
+        publications {
+            library(MavenPublication) {
+                //setGroupId groupId
+                setGroupId "com.tonyodev.fetch2"
+                //setArtifactId artifactId
+                setArtifactId "fetch2"
+                version "3.1.6"
+
+                artifact bundleDebugAar
+            }
+        }
+    }
 }
