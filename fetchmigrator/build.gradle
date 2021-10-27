@@ -69,6 +69,11 @@ tasks.withType(Javadoc).all {
     enabled = false
 }
 
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
 //simple settings
 project.afterEvaluate {
     publishing {

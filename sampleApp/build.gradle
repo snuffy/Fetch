@@ -56,7 +56,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:$rxJava2_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
 
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.4.1"))
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.2"))
     implementation("com.squareup.okhttp3:okhttp")              // No version!
 
     implementation project(':fetch2okhttp')

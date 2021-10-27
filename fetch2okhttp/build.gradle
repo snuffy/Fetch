@@ -78,6 +78,11 @@ tasks.withType(Javadoc).all {
     enabled = false
 }
 
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
 //simple settings
 project.afterEvaluate {
     publishing {
@@ -86,7 +91,7 @@ project.afterEvaluate {
                 //setGroupId groupId
                 setGroupId "com.tonyodev.fetch2okhttp"
                 //setArtifactId artifactId
-                setArtifactId "fetch2rx"
+                setArtifactId "fetch2okhttp"
                 version "3.1.6"
 
                 artifact bundleDebugAar
