@@ -9,6 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tonyodev.fetch2.PrioritySort
 import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2.database.migration.Migration
+import com.tonyodev.fetch2.database.models.ExtraUpdater
 import com.tonyodev.fetch2.exception.FetchException
 import com.tonyodev.fetch2.fetch.LiveSettings
 import com.tonyodev.fetch2.util.defaultNoError
@@ -115,11 +116,9 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun updateExtras(id: Int, extras: Extras): DownloadInfo? {
         throwExceptionIfClosed()
+        val newExtras = ExtraUpdater(id, extras)
+        requestDatabase.requestDao().updateExtras(newExtras)
         val download = requestDatabase.requestDao().get(id)
-        download?.let {
-            it.extras = extras
-            requestDatabase.requestDao().update(it)
-        }
         sanitize(download)
         return download
     }

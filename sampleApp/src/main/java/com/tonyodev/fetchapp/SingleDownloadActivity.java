@@ -5,9 +5,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.widget.TextView;
 
@@ -89,6 +93,7 @@ public class SingleDownloadActivity extends AppCompatActivity implements FetchOb
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             enqueueDownload();
         } else {
@@ -121,7 +126,7 @@ public class SingleDownloadActivity extends AppCompatActivity implements FetchOb
         extras.putBoolean("testBoolean", true);
         extras.putString("testString", "test");
         extras.putFloat("testFloat", Float.MIN_VALUE);
-        extras.putDouble("testDouble",Double.MIN_VALUE);
+        extras.putDouble("testDouble", Double.MIN_VALUE);
         extras.putInt("testInt", Integer.MAX_VALUE);
         extras.putLong("testLong", Long.MAX_VALUE);
         return extras;
@@ -137,6 +142,16 @@ public class SingleDownloadActivity extends AppCompatActivity implements FetchOb
             downloadSpeedTextView.setText(Utils.getDownloadSpeedString(this, download.getDownloadedBytesPerSecond()));
             if (download.getError() != Error.NONE) {
                 showDownloadErrorSnackBar(download.getError());
+            }
+
+            if (download.getStatus() == Status.COMPLETED) {
+                final MutableExtras extras = new MutableExtras();
+                extras.putBoolean("nathan_is_here", true);
+                fetch.replaceExtras(download.getId(), extras, result -> {
+                    Timber.d("update extras success = %s", result);
+                }, result -> {
+                    Timber.d("error= %s", result);
+                });
             }
         }
     }

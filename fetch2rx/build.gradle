@@ -43,6 +43,10 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         androidTest.java.srcDirs += 'src/androidTest/kotlin'
@@ -65,27 +69,6 @@ dependencies {
 tasks.withType(Javadoc).all {
     enabled = false
 }
-
-//
-//apply from: '../maven-publish-helper.gradle'
-//
-//publishing {
-//    publications {
-//        release(MavenPublication) {
-//            // Specify own groupId as package name of your library,
-//            // otherwise it would just use project's name (=name of the root directory) by default.
-//            groupId 'com.tonyodev.fetch2rx'
-//
-//            // Specify custom artifactId if needed,
-//            // otherwise it would use module's name by default.
-//            //artifactId 'custom-artifact'
-//
-//            // You can specify custom version,
-//            // otherwise it would use version from `android { defaultConfig { ... } }` by default.
-//            //version = '1.0'
-//        }
-//    }
-//}
 
 //simple settings
 project.afterEvaluate {

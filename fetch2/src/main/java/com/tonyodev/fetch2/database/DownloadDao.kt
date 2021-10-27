@@ -11,6 +11,7 @@ import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_PRIORITY
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_STATUS
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_TAG
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.TABLE_NAME
+import com.tonyodev.fetch2.database.models.ExtraUpdater
 
 
 @Dao
@@ -33,6 +34,9 @@ interface DownloadDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(download: DownloadInfo)
+
+    @Update(entity = DownloadInfo::class)
+    fun updateExtras(extras: ExtraUpdater)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(downloadInfoList: List<DownloadInfo>)
