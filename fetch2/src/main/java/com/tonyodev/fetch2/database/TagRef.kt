@@ -31,6 +31,7 @@ data class TagRef(
         val tagId: Int,
 
         @ColumnInfo(name = DownloadDatabase.COLUMN_ID,
-                typeAffinity = ColumnInfo.INTEGER)
+                typeAffinity = ColumnInfo.INTEGER,
+                index = true)
         val refId: Int
 )

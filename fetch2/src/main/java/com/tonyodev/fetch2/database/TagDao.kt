@@ -1,13 +1,18 @@
 package com.tonyodev.fetch2.database
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.IGNORE
-import androidx.room.Transaction
-import androidx.room.Update
+import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_TAG_ID
+import com.tonyodev.fetch2.database.DownloadDatabase.Companion.TABLE_NAME
+import com.tonyodev.fetch2.database.DownloadDatabase.Companion.TABLE_TAG_NAME
+import com.tonyodev.fetch2.database.join.TagWithDownloads
 
 @Dao
 abstract class TagDao {
+
+    @Transaction
+    @Query("SELECT * FROM $TABLE_TAG_NAME WHERE $COLUMN_TAG_ID=:tagId")
+    abstract fun getDownloadsByTag(tagId: Int): TagWithDownloads?
 
     @Insert(onConflict = IGNORE)
     abstract fun addTag(tag: Tag): Long

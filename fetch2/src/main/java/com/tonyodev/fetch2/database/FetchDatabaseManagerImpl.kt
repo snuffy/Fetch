@@ -223,7 +223,7 @@ class FetchDatabaseManagerImpl constructor(
         throwExceptionIfClosed()
 
         val tagId = Tag.generateId(tag)
-        val downloadsAndTag = requestDatabase.tagRefDao().getDownloadsByTag(tagId)
+        val downloadsAndTag = requestDatabase.tagDao().getDownloadsByTag(tagId)
         val downloads = downloadsAndTag?.downloads ?: emptyList()
         sanitize(downloads)
         return downloads
