@@ -41,6 +41,7 @@ interface FetchHandler : Closeable {
     fun updateRequest(requestId: Int, newRequest: Request): Pair<Download, Boolean>
     fun getDownloads(): List<Download>
     fun getDownload(id: Int): Download?
+    fun getDownloadByFile(file: String): Download?
     fun getDownloads(idList: List<Int>): List<Download>
     fun getDownloadsInGroup(id: Int): List<Download>
     fun getDownloadsWithStatus(status: Status): List<Download>
@@ -64,7 +65,15 @@ interface FetchHandler : Closeable {
     fun getPendingCount(): Long
     fun renameCompletedDownloadFile(id: Int, newFileName: String): Download
     fun getFetchGroup(id: Int): FetchGroup
-    fun addFetchObserversForDownload(downloadId: Int, vararg  fetchObservers: FetchObserver<Download>)
-    fun removeFetchObserversForDownload(downloadId: Int, vararg fetchObservers: FetchObserver<Download>)
+    fun addFetchObserversForDownload(
+        downloadId: Int,
+        vararg fetchObservers: FetchObserver<Download>
+    )
+
+    fun removeFetchObserversForDownload(
+        downloadId: Int,
+        vararg fetchObservers: FetchObserver<Download>
+    )
+
     fun resetAutoRetryAttempts(downloadId: Int, retryDownload: Boolean): Download?
 }

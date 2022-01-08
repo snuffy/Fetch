@@ -14,16 +14,19 @@ import com.tonyodev.fetch2.util.DEFAULT_ENABLE_LISTENER_NOTIFY_ON_ATTACHED
 import com.tonyodev.fetch2.util.toDownloadInfo
 import com.tonyodev.fetch2core.*
 
-open class FetchImpl constructor(override val namespace: String,
-                                 final override val fetchConfiguration: FetchConfiguration,
-                                 private val handlerWrapper: HandlerWrapper,
-                                 private val uiHandler: Handler,
-                                 private val fetchHandler: FetchHandler,
-                                 private val logger: Logger,
-                                 private val listenerCoordinator: ListenerCoordinator,
-                                 private val fetchDatabaseManagerWrapper: FetchDatabaseManagerWrapper) : Fetch {
+open class FetchImpl constructor(
+    override val namespace: String,
+    final override val fetchConfiguration: FetchConfiguration,
+    private val handlerWrapper: HandlerWrapper,
+    private val uiHandler: Handler,
+    private val fetchHandler: FetchHandler,
+    private val logger: Logger,
+    private val listenerCoordinator: ListenerCoordinator,
+    private val fetchDatabaseManagerWrapper: FetchDatabaseManagerWrapper
+) : Fetch {
 
     private val lock = Object()
+
     @Volatile
     private var closed = false
     override val isClosed: Boolean
@@ -44,7 +47,8 @@ open class FetchImpl constructor(override val namespace: String,
                     var hasActive: Boolean
                     while (iterator.hasNext()) {
                         activeDownloadInfo = iterator.next()
-                        hasActive = if (activeDownloadInfo.includeAddedDownloads) hasActiveDownloadsAdded else hasActiveDownloads
+                        hasActive =
+                            if (activeDownloadInfo.includeAddedDownloads) hasActiveDownloadsAdded else hasActiveDownloads
                         activeDownloadInfo.fetchObserver.onChanged(hasActive, Reason.REPORTING)
                     }
                 }
@@ -63,7 +67,10 @@ open class FetchImpl constructor(override val namespace: String,
     }
 
     private fun registerActiveDownloadsRunnable() {
-        handlerWrapper.postDelayed(activeDownloadsRunnable, fetchConfiguration.activeDownloadsCheckInterval)
+        handlerWrapper.postDelayed(
+            activeDownloadsRunnable,
+            fetchConfiguration.activeDownloadsCheckInterval
+        )
     }
 
     override fun enqueue(request: Request, func: Func<Request>?, func2: Func<Error>?): Fetch {
@@ -93,7 +100,10 @@ open class FetchImpl constructor(override val namespace: String,
         return this
     }
 
-    override fun enqueueBatch(requests: List<Request>, func: Func<List<Pair<DownloadInfo, Boolean>>>?) {
+    override fun enqueueBatch(
+        requests: List<Request>,
+        func: Func<List<Pair<DownloadInfo, Boolean>>>?
+    ) {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -111,7 +121,11 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    private fun enqueueRequest(requests: List<Request>, func: Func<List<Pair<Request, Error>>>?, func2: Func<Error>?) {
+    private fun enqueueRequest(
+        requests: List<Request>,
+        func: Func<List<Pair<Request, Error>>>?,
+        func2: Func<Error>?
+    ) {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -129,7 +143,8 @@ open class FetchImpl constructor(override val namespace: String,
                                 logger.d("Added $download")
                             }
                             Status.QUEUED -> {
-                                val downloadCopy = download.toDownloadInfo(fetchDatabaseManagerWrapper.getNewDownloadInfoInstance())
+                                val downloadCopy =
+                                    download.toDownloadInfo(fetchDatabaseManagerWrapper.getNewDownloadInfoInstance())
                                 downloadCopy.status = Status.ADDED
                                 listenerCoordinator.mainListener.onAdded(downloadCopy)
                                 logger.d("Added $download")
@@ -190,7 +205,12 @@ open class FetchImpl constructor(override val namespace: String,
         return this
     }
 
-    private fun pauseDownloads(ids: List<Int>?, groupId: Int?, func: Func<List<Download>>?, func2: Func<Error>?) {
+    private fun pauseDownloads(
+        ids: List<Int>?,
+        groupId: Int?,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ) {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -341,7 +361,12 @@ open class FetchImpl constructor(override val namespace: String,
         return resumeGroup(id, null, null)
     }
 
-    private fun resumeDownloads(ids: List<Int>?, groupId: Int?, func: Func<List<Download>>?, func2: Func<Error>?) {
+    private fun resumeDownloads(
+        ids: List<Int>?,
+        groupId: Int?,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ) {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -438,7 +463,11 @@ open class FetchImpl constructor(override val namespace: String,
         return removeAll(null, null)
     }
 
-    override fun removeAllWithStatus(status: Status, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
+    override fun removeAllWithStatus(
+        status: Status,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
         return executeRemoveAction({ fetchHandler.removeAllWithStatus(status) }, func, func2)
     }
 
@@ -446,15 +475,28 @@ open class FetchImpl constructor(override val namespace: String,
         return removeAllWithStatus(status, null, null)
     }
 
-    override fun removeAllInGroupWithStatus(id: Int, statuses: List<Status>, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
-        return executeRemoveAction({ fetchHandler.removeAllInGroupWithStatus(id, statuses) }, func, func2)
+    override fun removeAllInGroupWithStatus(
+        id: Int,
+        statuses: List<Status>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
+        return executeRemoveAction(
+            { fetchHandler.removeAllInGroupWithStatus(id, statuses) },
+            func,
+            func2
+        )
     }
 
     override fun removeAllInGroupWithStatus(id: Int, statuses: List<Status>): Fetch {
         return removeAllInGroupWithStatus(id, statuses, null, null)
     }
 
-    private fun executeRemoveAction(downloadAction: () -> List<Download>, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
+    private fun executeRemoveAction(
+        downloadAction: () -> List<Download>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -520,7 +562,11 @@ open class FetchImpl constructor(override val namespace: String,
         return deleteAll(null, null)
     }
 
-    override fun deleteAllWithStatus(status: Status, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
+    override fun deleteAllWithStatus(
+        status: Status,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
         return executeDeleteAction({ fetchHandler.deleteAllWithStatus(status) }, func, func2)
     }
 
@@ -528,15 +574,28 @@ open class FetchImpl constructor(override val namespace: String,
         return deleteAllWithStatus(status, null, null)
     }
 
-    override fun deleteAllInGroupWithStatus(id: Int, statuses: List<Status>, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
-        return executeDeleteAction({ fetchHandler.deleteAllInGroupWithStatus(id, statuses) }, func, func2)
+    override fun deleteAllInGroupWithStatus(
+        id: Int,
+        statuses: List<Status>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
+        return executeDeleteAction(
+            { fetchHandler.deleteAllInGroupWithStatus(id, statuses) },
+            func,
+            func2
+        )
     }
 
     override fun deleteAllInGroupWithStatus(id: Int, statuses: List<Status>): Fetch {
         return deleteAllInGroupWithStatus(id, statuses, null, null)
     }
 
-    private fun executeDeleteAction(downloadAction: () -> List<Download>, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
+    private fun executeDeleteAction(
+        downloadAction: () -> List<Download>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -602,7 +661,11 @@ open class FetchImpl constructor(override val namespace: String,
         return cancelAll(null, null)
     }
 
-    private fun executeCancelAction(downloadAction: () -> List<Download>, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
+    private fun executeCancelAction(
+        downloadAction: () -> List<Download>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -658,7 +721,12 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun resetAutoRetryAttempts(downloadId: Int, retryDownload: Boolean, func: Func2<Download?>?, func2: Func<Error>?): Fetch {
+    override fun resetAutoRetryAttempts(
+        downloadId: Int,
+        retryDownload: Boolean,
+        func: Func2<Download?>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -704,8 +772,10 @@ open class FetchImpl constructor(override val namespace: String,
         return retry(id, null, null)
     }
 
-    override fun updateRequest(requestId: Int, updatedRequest: Request, notifyListeners: Boolean, func: Func<Download>?,
-                               func2: Func<Error>?): Fetch {
+    override fun updateRequest(
+        requestId: Int, updatedRequest: Request, notifyListeners: Boolean, func: Func<Download>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -719,7 +789,11 @@ open class FetchImpl constructor(override val namespace: String,
                                 listenerCoordinator.mainListener.onCompleted(download)
                             }
                             Status.FAILED -> {
-                                listenerCoordinator.mainListener.onError(download, download.error, null)
+                                listenerCoordinator.mainListener.onError(
+                                    download,
+                                    download.error,
+                                    null
+                                )
                             }
                             Status.CANCELLED -> {
                                 listenerCoordinator.mainListener.onCancelled(download)
@@ -732,7 +806,8 @@ open class FetchImpl constructor(override val namespace: String,
                             }
                             Status.QUEUED -> {
                                 if (!downloadPair.second) {
-                                    val downloadCopy = download.toDownloadInfo(fetchDatabaseManagerWrapper.getNewDownloadInfoInstance())
+                                    val downloadCopy =
+                                        download.toDownloadInfo(fetchDatabaseManagerWrapper.getNewDownloadInfoInstance())
                                     downloadCopy.status = Status.ADDED
                                     listenerCoordinator.mainListener.onAdded(downloadCopy)
                                     logger.d("Added $download")
@@ -769,7 +844,12 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun renameCompletedDownloadFile(id: Int, newFileName: String, func: Func<Download>?, func2: Func<Error>?): Fetch {
+    override fun renameCompletedDownloadFile(
+        id: Int,
+        newFileName: String,
+        func: Func<Download>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -795,7 +875,12 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun replaceExtras(id: Int, extras: Extras, func: Func<Download>?, func2: Func<Error>?): Fetch {
+    override fun replaceExtras(
+        id: Int,
+        extras: Extras,
+        func: Func<Download>?,
+        func2: Func<Error>?
+    ): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -847,6 +932,19 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
+    override fun getDownloadByFile(file: String, func2: Func2<Download?>): Fetch {
+        synchronized(lock) {
+            throwExceptionIfClosed()
+            handlerWrapper.post {
+                val download = fetchHandler.getDownloadByFile(file)
+                uiHandler.post {
+                    func2.call(download)
+                }
+            }
+            return this
+        }
+    }
+
     override fun getDownloads(idList: List<Int>, func: Func<List<Download>>): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
@@ -886,7 +984,11 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun getDownloadsInGroupWithStatus(groupId: Int, statuses: List<Status>, func: Func<List<Download>>): Fetch {
+    override fun getDownloadsInGroupWithStatus(
+        groupId: Int,
+        statuses: List<Status>,
+        func: Func<List<Download>>
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -899,7 +1001,10 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun getDownloadsByRequestIdentifier(identifier: Long, func: Func<List<Download>>): Fetch {
+    override fun getDownloadsByRequestIdentifier(
+        identifier: Long,
+        func: Func<List<Download>>
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -951,7 +1056,12 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun addCompletedDownload(completedDownload: CompletedDownload, alertListeners: Boolean, func: Func<Download>?, func2: Func<Error>?): Fetch {
+    override fun addCompletedDownload(
+        completedDownload: CompletedDownload,
+        alertListeners: Boolean,
+        func: Func<Download>?,
+        func2: Func<Error>?
+    ): Fetch {
         return addCompletedDownloads(listOf(completedDownload), alertListeners, Func { downloads ->
             if (downloads.isNotEmpty()) {
                 func?.call(downloads.first())
@@ -961,7 +1071,12 @@ open class FetchImpl constructor(override val namespace: String,
         }, func2)
     }
 
-    override fun addCompletedDownloads(completedDownloads: List<CompletedDownload>, alertListeners: Boolean, func: Func<List<Download>>?, func2: Func<Error>?): Fetch {
+    override fun addCompletedDownloads(
+        completedDownloads: List<CompletedDownload>,
+        alertListeners: Boolean,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -1053,7 +1168,10 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun attachFetchObserversForDownload(downloadId: Int, vararg fetchObservers: FetchObserver<Download>): Fetch {
+    override fun attachFetchObserversForDownload(
+        downloadId: Int,
+        vararg fetchObservers: FetchObserver<Download>
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -1063,7 +1181,10 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun removeFetchObserversForDownload(downloadId: Int, vararg fetchObservers: FetchObserver<Download>): Fetch {
+    override fun removeFetchObserversForDownload(
+        downloadId: Int,
+        vararg fetchObservers: FetchObserver<Download>
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -1086,7 +1207,12 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun getContentLengthForRequest(request: Request, fromServer: Boolean, func: Func<Long>, func2: Func<Error>?): Fetch {
+    override fun getContentLengthForRequest(
+        request: Request,
+        fromServer: Boolean,
+        func: Func<Long>,
+        func2: Func<Error>?
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.executeWorkerTask {
@@ -1110,7 +1236,12 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun getContentLengthForRequests(requests: List<Request>, fromServer: Boolean, func: Func<List<Pair<Request, Long>>>, func2: Func<List<Pair<Request, Error>>>): Fetch {
+    override fun getContentLengthForRequests(
+        requests: List<Request>,
+        fromServer: Boolean,
+        func: Func<List<Pair<Request, Long>>>,
+        func2: Func<List<Pair<Request, Error>>>
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.executeWorkerTask {
@@ -1118,7 +1249,12 @@ open class FetchImpl constructor(override val namespace: String,
                 val results2 = mutableListOf<Pair<Request, Error>>()
                 for (request in requests) {
                     try {
-                        results.add(Pair(request, fetchHandler.getContentLengthForRequest(request, fromServer)))
+                        results.add(
+                            Pair(
+                                request,
+                                fetchHandler.getContentLengthForRequest(request, fromServer)
+                            )
+                        )
                     } catch (e: Exception) {
                         logger.e("Fetch with namespace $namespace error", e)
                         val error = getErrorFromMessage(e.message)
@@ -1138,10 +1274,12 @@ open class FetchImpl constructor(override val namespace: String,
     }
 
 
-    override fun getServerResponse(url: String,
-                                   headers: Map<String, String>?,
-                                   func: Func<Downloader.Response>,
-                                   func2: Func<Error>?): Fetch {
+    override fun getServerResponse(
+        url: String,
+        headers: Map<String, String>?,
+        func: Func<Downloader.Response>,
+        func2: Func<Error>?
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.executeWorkerTask {
@@ -1165,7 +1303,11 @@ open class FetchImpl constructor(override val namespace: String,
         }
     }
 
-    override fun getFetchFileServerCatalog(request: Request, func: Func<List<FileResource>>, func2: Func<Error>?): Fetch {
+    override fun getFetchFileServerCatalog(
+        request: Request,
+        func: Func<List<FileResource>>,
+        func2: Func<Error>?
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.executeWorkerTask {
@@ -1234,7 +1376,10 @@ open class FetchImpl constructor(override val namespace: String,
                 try {
                     fetchHandler.close()
                 } catch (e: Exception) {
-                    logger.e("exception occurred whiles shutting down Fetch with namespace:$namespace", e)
+                    logger.e(
+                        "exception occurred whiles shutting down Fetch with namespace:$namespace",
+                        e
+                    )
                 }
             }
         }
@@ -1242,8 +1387,10 @@ open class FetchImpl constructor(override val namespace: String,
 
     private fun throwExceptionIfClosed() {
         if (closed) {
-            throw FetchException("This fetch instance has been closed. Create a new " +
-                    "instance using the builder.")
+            throw FetchException(
+                "This fetch instance has been closed. Create a new " +
+                        "instance using the builder."
+            )
         }
     }
 
@@ -1255,7 +1402,10 @@ open class FetchImpl constructor(override val namespace: String,
         awaitFinishOrTimeout(-1)
     }
 
-    override fun addActiveDownloadsObserver(includeAddedDownloads: Boolean, fetchObserver: FetchObserver<Boolean>): Fetch {
+    override fun addActiveDownloadsObserver(
+        includeAddedDownloads: Boolean,
+        fetchObserver: FetchObserver<Boolean>
+    ): Fetch {
         synchronized(lock) {
             throwExceptionIfClosed()
             handlerWrapper.post {
@@ -1288,14 +1438,15 @@ open class FetchImpl constructor(override val namespace: String,
         @JvmStatic
         fun newInstance(modules: Modules): FetchImpl {
             return FetchImpl(
-                    namespace = modules.fetchConfiguration.namespace,
-                    fetchConfiguration = modules.fetchConfiguration,
-                    handlerWrapper = modules.handlerWrapper,
-                    uiHandler = modules.uiHandler,
-                    fetchHandler = modules.fetchHandler,
-                    logger = modules.fetchConfiguration.logger,
-                    listenerCoordinator = modules.listenerCoordinator,
-                    fetchDatabaseManagerWrapper = modules.fetchDatabaseManagerWrapper)
+                namespace = modules.fetchConfiguration.namespace,
+                fetchConfiguration = modules.fetchConfiguration,
+                handlerWrapper = modules.handlerWrapper,
+                uiHandler = modules.uiHandler,
+                fetchHandler = modules.fetchHandler,
+                logger = modules.fetchConfiguration.logger,
+                listenerCoordinator = modules.listenerCoordinator,
+                fetchDatabaseManagerWrapper = modules.fetchDatabaseManagerWrapper
+            )
         }
 
     }

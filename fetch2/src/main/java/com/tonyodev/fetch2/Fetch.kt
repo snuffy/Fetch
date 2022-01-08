@@ -5,7 +5,6 @@ import com.tonyodev.fetch2.database.DownloadInfo
 import com.tonyodev.fetch2.exception.FetchException
 import com.tonyodev.fetch2.fetch.FetchImpl
 import com.tonyodev.fetch2.fetch.FetchModulesBuilder
-import com.tonyodev.fetch2.util.DEFAULT_AUTO_RETRY_ATTEMPTS
 import com.tonyodev.fetch2.util.DEFAULT_ENABLE_LISTENER_NOTIFY_ON_ATTACHED
 import com.tonyodev.fetch2.util.DEFAULT_ENABLE_LISTENER_NOTIFY_ON_REQUEST_UPDATED
 import com.tonyodev.fetch2core.*
@@ -183,7 +182,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun resume(ids: List<Int>, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun resume(
+        ids: List<Int>,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /** Resume a download that has been paused.
      * @param ids ids of downloads to be resumed.
@@ -259,7 +262,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun remove(ids: List<Int>, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun remove(
+        ids: List<Int>,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Remove a list of downloads managed by this instance of Fetch.
@@ -337,7 +344,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun removeAllWithStatus(status: Status, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun removeAllWithStatus(
+        status: Status,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Remove all downloads with the specified status in this instance of Fetch.
@@ -357,7 +368,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun removeAllInGroupWithStatus(id: Int, statuses: List<Status>, func: Func<List<Download>>?, func2: Func<Error>? = null): Fetch
+    fun removeAllInGroupWithStatus(
+        id: Int,
+        statuses: List<Status>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Remove all downloads with the specified group and status in this instance of Fetch.
@@ -377,7 +393,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun delete(ids: List<Int>, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun delete(
+        ids: List<Int>,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Delete a list of downloads managed by this instance of Fetch.
@@ -454,7 +474,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun deleteAllWithStatus(status: Status, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun deleteAllWithStatus(
+        status: Status,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Deletes all downloads with the specified status in this instance of Fetch.
@@ -474,7 +498,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun deleteAllInGroupWithStatus(id: Int, statuses: List<Status>, func: Func<List<Download>>?, func2: Func<Error>? = null): Fetch
+    fun deleteAllInGroupWithStatus(
+        id: Int,
+        statuses: List<Status>,
+        func: Func<List<Download>>?,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Deletes all downloads with the specified group and status in this instance of Fetch.
@@ -494,7 +523,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun cancel(ids: List<Int>, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun cancel(
+        ids: List<Int>,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Cancel a list of non completed downloads managed by this instance of Fetch.
@@ -609,11 +642,13 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun updateRequest(requestId: Int,
-                      updatedRequest: Request,
-                      notifyListeners: Boolean = DEFAULT_ENABLE_LISTENER_NOTIFY_ON_REQUEST_UPDATED,
-                      func: Func<Download>? = null,
-                      func2: Func<Error>? = null): Fetch
+    fun updateRequest(
+        requestId: Int,
+        updatedRequest: Request,
+        notifyListeners: Boolean = DEFAULT_ENABLE_LISTENER_NOTIFY_ON_REQUEST_UPDATED,
+        func: Func<Download>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /** Replaces the existing extras object associated with an existing download/request with the newly passed in extras object.
      * @param id Id of existing request/download
@@ -623,7 +658,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun replaceExtras(id: Int, extras: Extras, func: Func<Download>? = null, func2: Func<Error>? = null): Fetch
+    fun replaceExtras(
+        id: Int,
+        extras: Extras,
+        func: Func<Download>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Resets the autoRetryAttempts value for a download back to 0.
@@ -634,7 +674,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun resetAutoRetryAttempts(downloadId: Int, retryDownload: Boolean = true, func: Func2<Download?>? = null, func2: Func<Error>? = null): Fetch
+    fun resetAutoRetryAttempts(
+        downloadId: Int,
+        retryDownload: Boolean = true,
+        func: Func2<Download?>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Renames the file for a completed download. The StorageResolver attached to this fetch instance will rename the file.
@@ -646,7 +691,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun renameCompletedDownloadFile(id: Int, newFileName: String, func: Func<Download>? = null, func2: Func<Error>? = null): Fetch
+    fun renameCompletedDownloadFile(
+        id: Int,
+        newFileName: String,
+        func: Func<Download>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Gets all downloads managed by this instance of Fetch.
@@ -674,6 +724,16 @@ interface Fetch {
      * @return Instance
      * */
     fun getDownload(id: Int, func2: Func2<Download?>): Fetch
+
+    /**
+     * Gets the download which has the specified file path. If the download
+     * does not exist null will be returned.
+     * @param file Download file path
+     * @param func2 Callback that the results will be returned on. Result maybe null.
+     * @throws FetchException if this instance of Fetch has been closed.
+     * @return Instance
+     * */
+    fun getDownloadByFile(file: String, func2: Func2<Download?>): Fetch
 
     /**
      * Gets all downloads in the specified group.
@@ -713,7 +773,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun getDownloadsInGroupWithStatus(groupId: Int, statuses: List<Status>, func: Func<List<Download>>): Fetch
+    fun getDownloadsInGroupWithStatus(
+        groupId: Int,
+        statuses: List<Status>,
+        func: Func<List<Download>>
+    ): Fetch
 
     /**
      * Gets all downloads containing the identifier.
@@ -766,7 +830,10 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun addListener(listener: FetchListener, notify: Boolean = DEFAULT_ENABLE_LISTENER_NOTIFY_ON_ATTACHED): Fetch
+    fun addListener(
+        listener: FetchListener,
+        notify: Boolean = DEFAULT_ENABLE_LISTENER_NOTIFY_ON_ATTACHED
+    ): Fetch
 
     /** Attaches a FetchListener to this instance of Fetch.
      * @param listener Fetch Listener
@@ -776,7 +843,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun addListener(listener: FetchListener, notify: Boolean = DEFAULT_ENABLE_LISTENER_NOTIFY_ON_ATTACHED, autoStart: Boolean): Fetch
+    fun addListener(
+        listener: FetchListener,
+        notify: Boolean = DEFAULT_ENABLE_LISTENER_NOTIFY_ON_ATTACHED,
+        autoStart: Boolean
+    ): Fetch
 
     /** Detaches a FetchListener from this instance of Fetch.
      * @param listener Fetch Listener
@@ -795,7 +866,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun addCompletedDownload(completedDownload: CompletedDownload, alertListeners: Boolean = true, func: Func<Download>? = null, func2: Func<Error>? = null): Fetch
+    fun addCompletedDownload(
+        completedDownload: CompletedDownload,
+        alertListeners: Boolean = true,
+        func: Func<Download>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Adds a list of completed downloads to Fetch for management. If Fetch is already managing another download with the same file as this completed download's
@@ -807,7 +883,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun addCompletedDownloads(completedDownloads: List<CompletedDownload>, alertListeners: Boolean = true, func: Func<List<Download>>? = null, func2: Func<Error>? = null): Fetch
+    fun addCompletedDownloads(
+        completedDownloads: List<CompletedDownload>,
+        alertListeners: Boolean = true,
+        func: Func<List<Download>>? = null,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Gets the list of download blocks belonging to a download. List may be empty if
@@ -835,7 +916,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun getContentLengthForRequest(request: Request, fromServer: Boolean, func: Func<Long>, func2: Func<Error>?): Fetch
+    fun getContentLengthForRequest(
+        request: Request,
+        fromServer: Boolean,
+        func: Func<Long>,
+        func2: Func<Error>?
+    ): Fetch
 
     /**
      * Gets the content Length for each request in the passed in list. If the request or contentLength cannot be found in
@@ -851,7 +937,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun getContentLengthForRequests(requests:List<Request>, fromServer: Boolean, func: Func<List<Pair<Request,Long>>>, func2: Func<List<Pair<Request, Error>>>): Fetch
+    fun getContentLengthForRequests(
+        requests: List<Request>,
+        fromServer: Boolean,
+        func: Func<List<Pair<Request, Long>>>,
+        func2: Func<List<Pair<Request, Error>>>
+    ): Fetch
 
     /**
      * Gets the Server Response for the url and associated headers.
@@ -862,7 +953,12 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun getServerResponse(url: String, headers: Map<String, String>?, func: Func<Downloader.Response>, func2: Func<Error>? = null): Fetch
+    fun getServerResponse(
+        url: String,
+        headers: Map<String, String>?,
+        func: Func<Downloader.Response>,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Gets the full File Resource Catalog of a Fetch File Server.
@@ -873,7 +969,11 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return Instance
      * */
-    fun getFetchFileServerCatalog(request: Request, func: Func<List<FileResource>>, func2: Func<Error>? = null): Fetch
+    fun getFetchFileServerCatalog(
+        request: Request,
+        func: Func<List<FileResource>>,
+        func2: Func<Error>? = null
+    ): Fetch
 
     /**
      * Enable or disable logging.
@@ -949,7 +1049,10 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return instance
      * */
-    fun attachFetchObserversForDownload(downloadId: Int, vararg fetchObservers: FetchObserver<Download>): Fetch
+    fun attachFetchObserversForDownload(
+        downloadId: Int,
+        vararg fetchObservers: FetchObserver<Download>
+    ): Fetch
 
     /**
      * Removes a FetchObserver attached to this Fetch namespace for a download.
@@ -958,7 +1061,10 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return instance
      * */
-    fun removeFetchObserversForDownload(downloadId: Int, vararg fetchObservers: FetchObserver<Download>): Fetch
+    fun removeFetchObserversForDownload(
+        downloadId: Int,
+        vararg fetchObservers: FetchObserver<Download>
+    ): Fetch
 
     /** Indicates if this fetch namespace has active(Queued or Downloading) downloads. You can use this value to
      * keep a background service ongoing until the callback function returns false.
@@ -976,7 +1082,10 @@ interface Fetch {
      * @throws FetchException if this instance of Fetch has been closed.
      * @return instance
      * */
-    fun addActiveDownloadsObserver(includeAddedDownloads: Boolean = false, fetchObserver: FetchObserver<Boolean>): Fetch
+    fun addActiveDownloadsObserver(
+        includeAddedDownloads: Boolean = false,
+        fetchObserver: FetchObserver<Boolean>
+    ): Fetch
 
     /** Removes a subscribed FetchObserver that is listening for active downloads.
      * @param fetchObserver the fetch observer to remove.
@@ -991,9 +1100,11 @@ interface Fetch {
     companion object Impl {
 
         private val lock = Any()
+
         @SuppressLint("StaticFieldLeak")
         @Volatile
         private var defaultFetchConfiguration: FetchConfiguration? = null
+
         @Volatile
         private var defaultFetchInstance: Fetch? = null
 
@@ -1025,10 +1136,12 @@ interface Fetch {
         fun getDefaultInstance(): Fetch {
             return synchronized(lock) {
                 val fetchConfiguration = defaultFetchConfiguration
-                        ?: throw FetchException(GLOBAL_FETCH_CONFIGURATION_NOT_SET)
+                    ?: throw FetchException(GLOBAL_FETCH_CONFIGURATION_NOT_SET)
                 val defaultFetch = defaultFetchInstance
                 if (defaultFetch == null || defaultFetch.isClosed) {
-                    val newDefaultFetch = FetchImpl.newInstance(FetchModulesBuilder.buildModulesFromPrefs(fetchConfiguration))
+                    val newDefaultFetch = FetchImpl.newInstance(
+                        FetchModulesBuilder.buildModulesFromPrefs(fetchConfiguration)
+                    )
                     defaultFetchInstance = newDefaultFetch
                     newDefaultFetch
                 } else {
@@ -1043,7 +1156,11 @@ interface Fetch {
          * @return custom Fetch instance
          * */
         fun getInstance(fetchConfiguration: FetchConfiguration): Fetch {
-            return FetchImpl.newInstance(FetchModulesBuilder.buildModulesFromPrefs(fetchConfiguration))
+            return FetchImpl.newInstance(
+                FetchModulesBuilder.buildModulesFromPrefs(
+                    fetchConfiguration
+                )
+            )
         }
 
     }

@@ -512,6 +512,10 @@ class FetchHandlerImpl(
         return fetchDatabaseManagerWrapper.get(id)
     }
 
+    override fun getDownloadByFile(file: String): Download? {
+        return fetchDatabaseManagerWrapper.getByFile(file)
+    }
+
     override fun getDownloads(idList: List<Int>): List<Download> {
         return fetchDatabaseManagerWrapper.get(idList).filterNotNull()
     }
