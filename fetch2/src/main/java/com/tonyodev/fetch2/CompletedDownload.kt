@@ -28,6 +28,8 @@ open class CompletedDownload : Parcelable, Serializable {
     /** The tag associated with this download.*/
     var tag: String? = null
 
+    var tags: List<String> = mutableListOf()
+
     /** Set your own unique identifier for the download.*/
     var identifier: Long = 0
 
@@ -49,6 +51,7 @@ open class CompletedDownload : Parcelable, Serializable {
         if (group != other.group) return false
         if (headers != other.headers) return false
         if (tag != other.tag) return false
+        if (tags != other.tags) return false
         if (identifier != other.identifier) return false
         if (created != other.created) return false
         if (extras != other.extras) return false
@@ -61,6 +64,7 @@ open class CompletedDownload : Parcelable, Serializable {
         result = 31 * result + group
         result = 31 * result + headers.hashCode()
         result = 31 * result + (tag?.hashCode() ?: 0)
+        result = 31 * result + tags.hashCode()
         result = 31 * result + identifier.hashCode()
         result = 31 * result + created.hashCode()
         result = 31 * result + extras.hashCode()
@@ -69,7 +73,7 @@ open class CompletedDownload : Parcelable, Serializable {
 
     override fun toString(): String {
         return "CompletedDownload(url='$url', file='$file', groupId=$group, " +
-                "headers=$headers, tag=$tag, identifier=$identifier, created=$created, " +
+                "headers=$headers, tag=$tag, tags=$tags, identifier=$identifier, created=$created, " +
                 "extras=$extras)"
     }
 
@@ -80,6 +84,7 @@ open class CompletedDownload : Parcelable, Serializable {
         dest.writeLong(fileByteSize)
         dest.writeSerializable(HashMap(headers))
         dest.writeString(tag)
+        dest.writeStringList(tags)
         dest.writeLong(identifier)
         dest.writeLong(created)
         dest.writeSerializable(HashMap(extras.map))
@@ -99,6 +104,10 @@ open class CompletedDownload : Parcelable, Serializable {
             val fileByteSize = source.readLong()
             val headers = source.readSerializable() as Map<String, String>
             val tag = source.readString()
+            val tags = mutableListOf<String>().let {
+                source.readStringList(it)
+                return@let it
+            }
             val identifier = source.readLong()
             val created = source.readLong()
             val extras = source.readSerializable() as Map<String, String>
@@ -110,6 +119,7 @@ open class CompletedDownload : Parcelable, Serializable {
             completedDownload.fileByteSize = fileByteSize
             completedDownload.headers = headers
             completedDownload.tag = tag
+            completedDownload.tags = tags
             completedDownload.identifier = identifier
             completedDownload.created = created
             completedDownload.extras = Extras(extras)

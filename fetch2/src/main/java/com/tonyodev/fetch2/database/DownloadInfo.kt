@@ -64,7 +64,7 @@ open class DownloadInfo : Download {
     override var tag: String? = null
 
     @Ignore
-    override val tags: List<String> = mutableListOf()
+    override var tags: List<String> = mutableListOf()
 
     @ColumnInfo(name = DownloadDatabase.COLUMN_ENQUEUE_ACTION, typeAffinity = ColumnInfo.INTEGER)
     override var enqueueAction: EnqueueAction = EnqueueAction.REPLACE_EXISTING
@@ -190,6 +190,7 @@ open class DownloadInfo : Download {
         dest.writeInt(networkType.value)
         dest.writeLong(created)
         dest.writeString(tag)
+        dest.writeStringList(tags)
         dest.writeInt(enqueueAction.value)
         dest.writeLong(identifier)
         dest.writeInt(if (downloadOnEnqueue) 1 else 0)
@@ -208,7 +209,7 @@ open class DownloadInfo : Download {
         return "DownloadInfo(id=$id, namespace='$namespace', url='$url', file='$file', " +
                 "group=$group, priority=$priority, headers=$headers, downloaded=$downloaded," +
                 " total=$total, status=$status, error=$error, networkType=$networkType, " +
-                "created=$created, tag=$tag, enqueueAction=$enqueueAction, identifier=$identifier," +
+                "created=$created, tag=$tag, tags=$tags, enqueueAction=$enqueueAction, identifier=$identifier," +
                 " downloadOnEnqueue=$downloadOnEnqueue, extras=$extras, " +
                 "autoRetryMaxAttempts=$autoRetryMaxAttempts, autoRetryAttempts=$autoRetryAttempts," +
                 " etaInMilliSeconds=$etaInMilliSeconds, downloadedBytesPerSecond=$downloadedBytesPerSecond)"
@@ -232,6 +233,10 @@ open class DownloadInfo : Download {
             val networkType = NetworkType.valueOf(source.readInt())
             val created = source.readLong()
             val tag = source.readString()
+            val tags = mutableListOf<String>().let {
+                source.readStringList(it)
+                return@let it
+            }
             val enqueueAction = EnqueueAction.valueOf(source.readInt())
             val identifier = source.readLong()
             val downloadOnEnqueue = source.readInt() == 1
@@ -256,6 +261,7 @@ open class DownloadInfo : Download {
             downloadInfo.networkType = networkType
             downloadInfo.created = created
             downloadInfo.tag = tag
+            downloadInfo.tags = tags
             downloadInfo.enqueueAction = enqueueAction
             downloadInfo.identifier = identifier
             downloadInfo.downloadOnEnqueue = downloadOnEnqueue

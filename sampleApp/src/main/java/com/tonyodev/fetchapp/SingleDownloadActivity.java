@@ -28,6 +28,8 @@ import com.tonyodev.fetch2core.Reason;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+
 import timber.log.Timber;
 
 
@@ -105,6 +107,10 @@ public class SingleDownloadActivity extends AppCompatActivity implements FetchOb
         final String url = Data.sampleUrls[0];
         final String filePath = Data.getSaveDir(this) + "/movies/" + Data.getNameFromUrl(url);
         request = new Request(url, filePath);
+
+        ArrayList<String> tags = new ArrayList<>();
+        tags.add("bookmark-1");
+        request.setTags(tags);
         request.setExtras(getExtrasForRequest(request));
 
         fetch.attachFetchObserversForDownload(request.getId(), this)

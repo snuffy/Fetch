@@ -18,6 +18,7 @@ fun Request.toDownloadInfo(downloadInfo: DownloadInfo): DownloadInfo {
     downloadInfo.error = defaultNoError
     downloadInfo.downloaded = 0L
     downloadInfo.tag = tag
+    downloadInfo.tags = tags
     downloadInfo.enqueueAction = enqueueAction
     downloadInfo.identifier = identifier
     downloadInfo.downloadOnEnqueue = downloadOnEnqueue
@@ -42,6 +43,7 @@ fun Download.toDownloadInfo(downloadInfo: DownloadInfo): DownloadInfo {
     downloadInfo.error = error
     downloadInfo.created = created
     downloadInfo.tag = tag
+    downloadInfo.tags = tags
     downloadInfo.enqueueAction = enqueueAction
     downloadInfo.identifier = identifier
     downloadInfo.downloadOnEnqueue = downloadOnEnqueue
@@ -65,6 +67,7 @@ fun CompletedDownload.toDownloadInfo(downloadInfo: DownloadInfo): DownloadInfo {
     downloadInfo.error = Error.NONE
     downloadInfo.created = created
     downloadInfo.tag = tag
+    downloadInfo.tags = tags
     downloadInfo.enqueueAction = EnqueueAction.REPLACE_EXISTING
     downloadInfo.identifier = identifier
     downloadInfo.downloadOnEnqueue = DEFAULT_DOWNLOAD_ON_ENQUEUE
