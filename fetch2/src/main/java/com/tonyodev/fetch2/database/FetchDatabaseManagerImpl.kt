@@ -19,13 +19,13 @@ import com.tonyodev.fetch2core.Logger
 
 
 class FetchDatabaseManagerImpl constructor(
-    context: Context,
-    private val namespace: String,
-    override val logger: Logger,
-    migrations: Array<Migration>,
-    private val liveSettings: LiveSettings,
-    private val fileExistChecksEnabled: Boolean,
-    private val defaultStorageResolver: DefaultStorageResolver
+        context: Context,
+        private val namespace: String,
+        override val logger: Logger,
+        migrations: Array<Migration>,
+        private val liveSettings: LiveSettings,
+        private val fileExistChecksEnabled: Boolean,
+        private val defaultStorageResolver: DefaultStorageResolver
 ) : FetchDatabaseManager<DownloadInfo> {
 
     @Volatile
@@ -48,12 +48,14 @@ class FetchDatabaseManagerImpl constructor(
     override fun insert(downloadInfo: DownloadInfo): Pair<DownloadInfo, Boolean> {
         throwExceptionIfClosed()
         val row = requestDatabase.requestDao().insert(downloadInfo)
+        executeInsertOrUpdateTag(downloadInfo)
         return Pair(downloadInfo, requestDatabase.wasRowInserted(row))
     }
 
     override fun insert(downloadInfoList: List<DownloadInfo>): List<Pair<DownloadInfo, Boolean>> {
         throwExceptionIfClosed()
         val rowsList = requestDatabase.requestDao().insert(downloadInfoList)
+        downloadInfoList.map { executeInsertOrUpdateTag(it) }
         return rowsList.indices.map {
             Pair(downloadInfoList[it], requestDatabase.wasRowInserted(rowsList[it]))
         }
@@ -78,11 +80,13 @@ class FetchDatabaseManagerImpl constructor(
     override fun update(downloadInfo: DownloadInfo) {
         throwExceptionIfClosed()
         requestDatabase.requestDao().update(downloadInfo)
+        executeInsertOrUpdateTag(downloadInfo)
     }
 
     override fun update(downloadInfoList: List<DownloadInfo>) {
         throwExceptionIfClosed()
         requestDatabase.requestDao().update(downloadInfoList)
+        downloadInfoList.map { executeInsertOrUpdateTag(it) }
     }
 
     override fun updateFileBytesInfoAndStatusOnly(downloadInfo: DownloadInfo) {
@@ -91,17 +95,17 @@ class FetchDatabaseManagerImpl constructor(
             database.beginTransaction()
 
             database.execSQL(
-                "UPDATE ${DownloadDatabase.TABLE_NAME} SET "
-                        + "${DownloadDatabase.COLUMN_DOWNLOADED} = ?, "
-                        + "${DownloadDatabase.COLUMN_TOTAL} = ?, "
-                        + "${DownloadDatabase.COLUMN_STATUS} = ? "
-                        + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
-                arrayOf(
-                    downloadInfo.downloaded,
-                    downloadInfo.total,
-                    downloadInfo.status.value,
-                    downloadInfo.id
-                )
+                    "UPDATE ${DownloadDatabase.TABLE_NAME} SET "
+                            + "${DownloadDatabase.COLUMN_DOWNLOADED} = ?, "
+                            + "${DownloadDatabase.COLUMN_TOTAL} = ?, "
+                            + "${DownloadDatabase.COLUMN_STATUS} = ? "
+                            + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
+                    arrayOf(
+                            downloadInfo.downloaded,
+                            downloadInfo.total,
+                            downloadInfo.status.value,
+                            downloadInfo.id
+                    )
             )
             database.setTransactionSuccessful()
         } catch (e: SQLiteException) {
@@ -177,8 +181,8 @@ class FetchDatabaseManagerImpl constructor(
     }
 
     override fun getDownloadsInGroupWithStatus(
-        groupId: Int,
-        statuses: List<Status>
+            groupId: Int,
+            statuses: List<Status>
     ): List<DownloadInfo> {
         throwExceptionIfClosed()
         var downloads = requestDatabase.requestDao().getByGroupWithStatus(groupId, statuses)
@@ -222,21 +226,36 @@ class FetchDatabaseManagerImpl constructor(
         return downloads
     }
 
+    private fun executeInsertOrUpdateTag(info: DownloadInfo) {
+        val tags: List<String> = when {
+            info.tags.isNotEmpty() -> info.tags
+            info.tag != null -> listOf(info.tag!!)
+            else -> listOf()
+        }
+
+        tags.map {
+            val tag = Tag(it.hashCode(), it)
+            val tagRef = TagRef(tag.id, info.id)
+            requestDatabase.tagDao().addOrUpdateTag(tag)
+            requestDatabase.tagRefDao().addOrUpdateTagRef(tagRef)
+        }
+    }
+
     private val pendingCountQuery =
-        "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
-                " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
-                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'"
+            "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
+                    " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
+                    " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'"
 
     private val pendingCountIncludeAddedQuery =
-        "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
-                " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
-                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'" +
-                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.ADDED.value}'"
+            "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
+                    " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
+                    " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'" +
+                    " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.ADDED.value}'"
 
     override fun getPendingCount(includeAddedDownloads: Boolean): Long {
         return try {
             val query =
-                if (includeAddedDownloads) pendingCountIncludeAddedQuery else pendingCountQuery
+                    if (includeAddedDownloads) pendingCountIncludeAddedQuery else pendingCountQuery
             val cursor: Cursor? = database.query(query)
             val count = cursor?.count?.toLong() ?: -1L
             cursor?.close()
@@ -261,8 +280,8 @@ class FetchDatabaseManagerImpl constructor(
     private fun sanitize(downloads: List<DownloadInfo>, firstEntry: Boolean = false): Boolean {
         updatedDownloadsList.clear()
         var downloadInfo: DownloadInfo
-        for (i in 0 until downloads.size) {
-            downloadInfo = downloads[i]
+        for (element in downloads) {
+            downloadInfo = element
             when (downloadInfo.status) {
                 Status.COMPLETED -> onCompleted(downloadInfo)
                 Status.DOWNLOADING -> onDownloading(downloadInfo, firstEntry)
@@ -306,11 +325,11 @@ class FetchDatabaseManagerImpl constructor(
     private fun onDownloading(downloadInfo: DownloadInfo, firstEntry: Boolean) {
         if (firstEntry) {
             val status =
-                if (downloadInfo.downloaded > 0 && downloadInfo.total > 0 && downloadInfo.downloaded >= downloadInfo.total) {
-                    Status.COMPLETED
-                } else {
-                    Status.QUEUED
-                }
+                    if (downloadInfo.downloaded > 0 && downloadInfo.total > 0 && downloadInfo.downloaded >= downloadInfo.total) {
+                        Status.COMPLETED
+                    } else {
+                        Status.QUEUED
+                    }
             downloadInfo.status = status
             downloadInfo.error = defaultNoError
             updatedDownloadsList.add(downloadInfo)

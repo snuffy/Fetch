@@ -6,11 +6,17 @@ import androidx.room.TypeConverters
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.DATABASE_VERSION
 import com.tonyodev.fetch2.database.migration.*
 
-@Database(entities = [DownloadInfo::class], version = DATABASE_VERSION, exportSchema = false)
+@Database(entities = [
+    DownloadInfo::class,
+    Tag::class,
+    TagRef::class
+], version = DATABASE_VERSION, exportSchema = false)
 @TypeConverters(value = [Converter::class])
 abstract class DownloadDatabase : RoomDatabase() {
 
     abstract fun requestDao(): DownloadDao
+    abstract fun tagDao(): TagDao
+    abstract fun tagRefDao(): TagRefDao
 
     fun wasRowInserted(row: Long): Boolean {
         return row != (-1).toLong()
@@ -18,7 +24,11 @@ abstract class DownloadDatabase : RoomDatabase() {
 
     companion object {
         const val TABLE_NAME = "requests"
+        const val TABLE_TAG_NAME = "tags"
+        const val TABLE_TAG_REF_NAME = "tags_ref"
+
         const val COLUMN_ID = "_id"
+        const val COLUMN_TITLE = "_title"
         const val COLUMN_NAMESPACE = "_namespace"
         const val COLUMN_URL = "_url"
         const val COLUMN_FILE = "_file"
@@ -38,8 +48,9 @@ abstract class DownloadDatabase : RoomDatabase() {
         const val COLUMN_EXTRAS = "_extras"
         const val COLUMN_AUTO_RETRY_MAX_ATTEMPTS = "_auto_retry_max_attempts"
         const val COLUMN_AUTO_RETRY_ATTEMPTS = "_auto_retry_attempts"
-        const val OLD_DATABASE_VERSION = 6
-        const val DATABASE_VERSION = 7
+        const val COLUMN_TAG_ID = "_tag_id"
+        const val OLD_DATABASE_VERSION = 7
+        const val DATABASE_VERSION = 8
 
         @JvmStatic
         fun getMigrations(): Array<Migration> {

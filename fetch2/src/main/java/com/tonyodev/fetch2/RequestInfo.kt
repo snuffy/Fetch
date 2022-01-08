@@ -41,6 +41,8 @@ open class RequestInfo : Serializable {
     /** Associate a tag for this request*/
     var tag: String? = null
 
+    var tags: List<String> = mutableListOf()
+
     /**
      * Action used by Fetch when enqueuing a request and a previous request with the
      * same file is already being managed. Default EnqueueAction.REPLACE_EXISTING
@@ -90,6 +92,7 @@ open class RequestInfo : Serializable {
         if (priority != other.priority) return false
         if (networkType != other.networkType) return false
         if (tag != other.tag) return false
+        if (tags != other.tags) return false
         if (enqueueAction != other.enqueueAction) return false
         if (downloadOnEnqueue != other.downloadOnEnqueue) return false
         if (extras != other.extras) return false
@@ -104,6 +107,7 @@ open class RequestInfo : Serializable {
         result = 31 * result + priority.hashCode()
         result = 31 * result + networkType.hashCode()
         result = 31 * result + (tag?.hashCode() ?: 0)
+        result = 31 * result + tags.hashCode()
         result = 31 * result + enqueueAction.hashCode()
         result = 31 * result + downloadOnEnqueue.hashCode()
         result = 31 * result + extras.hashCode()
@@ -114,7 +118,7 @@ open class RequestInfo : Serializable {
     override fun toString(): String {
         return "RequestInfo(identifier=$identifier, groupId=$groupId," +
                 " headers=$headers, priority=$priority, networkType=$networkType," +
-                " tag=$tag, enqueueAction=$enqueueAction, downloadOnEnqueue=$downloadOnEnqueue, " +
+                " tag=$tag, tags=$tags, enqueueAction=$enqueueAction, downloadOnEnqueue=$downloadOnEnqueue, " +
                 "autoRetryMaxAttempts=$autoRetryMaxAttempts, extras=$extras)"
     }
 

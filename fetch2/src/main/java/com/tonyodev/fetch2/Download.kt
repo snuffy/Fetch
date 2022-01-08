@@ -79,6 +79,8 @@ interface Download : Parcelable, Serializable {
     /** Gets the tag associated with this download.*/
     val tag: String?
 
+    val tags: List<String>
+
     /**
      * Action used by Fetch when enqueuing a request and a previous request with the
      * same file is already being managed. Default EnqueueAction.REPLACE_EXISTING
@@ -109,7 +111,7 @@ interface Download : Parcelable, Serializable {
     /** The estimated time in milliseconds until the download completes.
      *  This field will always be -1 if the download is not currently being downloaded.
      * */
-    val  etaInMilliSeconds: Long
+    val etaInMilliSeconds: Long
 
     /** Average downloaded bytes per second.
      * Can return -1 to indicate that the estimated time remaining is unknown. This field will

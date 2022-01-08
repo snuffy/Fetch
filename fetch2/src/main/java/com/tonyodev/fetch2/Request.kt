@@ -66,6 +66,7 @@ open class Request constructor(
         parcel.writeString(file)
         parcel.writeLong(identifier)
         parcel.writeInt(groupId)
+        parcel.writeStringList(tags)
         parcel.writeSerializable(HashMap(headers))
         parcel.writeInt(priority.value)
         parcel.writeInt(networkType.value)
@@ -92,6 +93,10 @@ open class Request constructor(
             val priority = Priority.valueOf(input.readInt())
             val networkType = NetworkType.valueOf(input.readInt())
             val tag = input.readString()
+            val tags: List<String> = mutableListOf<String>().let {
+                input.readStringList(it)
+                return@let it
+            }
             val enqueueAction = EnqueueAction.valueOf(input.readInt())
             val downloadOnEnqueue = input.readInt() == 1
             val extras = input.readSerializable() as Map<String, String>
@@ -105,6 +110,7 @@ open class Request constructor(
             request.priority = priority
             request.networkType = networkType
             request.tag = tag
+            request.tags = tags
             request.enqueueAction = enqueueAction
             request.downloadOnEnqueue = downloadOnEnqueue
             request.extras = Extras(extras)

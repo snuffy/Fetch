@@ -159,6 +159,8 @@ interface Downloader<T, R> : Closeable {
             /** The tag associated with this request.*/
             val tag: String?,
 
+            val tags: List<String> = mutableListOf(),
+
             /** The identifier associated with this request*/
             val identifier: Long,
 
@@ -173,7 +175,7 @@ interface Downloader<T, R> : Closeable {
 
             /** redirect url*/
             val redirectUrl: String,
-            
+
             /**
              * If the request will be downloaded using the parallel download and the file slice count is greater the 1. This field will indicate
              * the request segment/part.

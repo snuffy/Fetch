@@ -63,6 +63,9 @@ open class DownloadInfo : Download {
     @ColumnInfo(name = DownloadDatabase.COLUMN_TAG, typeAffinity = ColumnInfo.TEXT)
     override var tag: String? = null
 
+    @Ignore
+    override val tags: List<String> = mutableListOf()
+
     @ColumnInfo(name = DownloadDatabase.COLUMN_ENQUEUE_ACTION, typeAffinity = ColumnInfo.INTEGER)
     override var enqueueAction: EnqueueAction = EnqueueAction.REPLACE_EXISTING
 
@@ -170,7 +173,6 @@ open class DownloadInfo : Download {
         result = 31 * result + autoRetryAttempts.hashCode()
         return result
     }
-
 
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
