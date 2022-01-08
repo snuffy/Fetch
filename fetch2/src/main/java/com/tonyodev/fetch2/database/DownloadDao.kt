@@ -11,6 +11,7 @@ import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_PRIORITY
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_STATUS
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_TAG
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.TABLE_NAME
+import com.tonyodev.fetch2.database.join.DownloadWithTags
 import com.tonyodev.fetch2.database.models.ExtraUpdater
 
 
@@ -51,7 +52,7 @@ interface DownloadDao {
     fun get(ids: List<Int>): List<DownloadInfo>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_FILE = :file")
-    fun getByFile(file: String): DownloadInfo?
+    fun getByFile(file: String): DownloadWithTags?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_STATUS = :status")
     fun getByStatus(status: Status): List<DownloadInfo>

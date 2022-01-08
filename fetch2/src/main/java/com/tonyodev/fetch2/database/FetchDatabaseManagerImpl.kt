@@ -19,13 +19,13 @@ import com.tonyodev.fetch2core.Logger
 
 
 class FetchDatabaseManagerImpl constructor(
-        context: Context,
-        private val namespace: String,
-        override val logger: Logger,
-        migrations: Array<Migration>,
-        private val liveSettings: LiveSettings,
-        private val fileExistChecksEnabled: Boolean,
-        private val defaultStorageResolver: DefaultStorageResolver
+    context: Context,
+    private val namespace: String,
+    override val logger: Logger,
+    migrations: Array<Migration>,
+    private val liveSettings: LiveSettings,
+    private val fileExistChecksEnabled: Boolean,
+    private val defaultStorageResolver: DefaultStorageResolver
 ) : FetchDatabaseManager<DownloadInfo> {
 
     @Volatile
@@ -95,17 +95,17 @@ class FetchDatabaseManagerImpl constructor(
             database.beginTransaction()
 
             database.execSQL(
-                    "UPDATE ${DownloadDatabase.TABLE_NAME} SET "
-                            + "${DownloadDatabase.COLUMN_DOWNLOADED} = ?, "
-                            + "${DownloadDatabase.COLUMN_TOTAL} = ?, "
-                            + "${DownloadDatabase.COLUMN_STATUS} = ? "
-                            + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
-                    arrayOf(
-                            downloadInfo.downloaded,
-                            downloadInfo.total,
-                            downloadInfo.status.value,
-                            downloadInfo.id
-                    )
+                "UPDATE ${DownloadDatabase.TABLE_NAME} SET "
+                        + "${DownloadDatabase.COLUMN_DOWNLOADED} = ?, "
+                        + "${DownloadDatabase.COLUMN_TOTAL} = ?, "
+                        + "${DownloadDatabase.COLUMN_STATUS} = ? "
+                        + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
+                arrayOf(
+                    downloadInfo.downloaded,
+                    downloadInfo.total,
+                    downloadInfo.status.value,
+                    downloadInfo.id
+                )
             )
             database.setTransactionSuccessful()
         } catch (e: SQLiteException) {
@@ -150,7 +150,10 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getByFile(file: String): DownloadInfo? {
         throwExceptionIfClosed()
-        val download = requestDatabase.requestDao().getByFile(file)
+        val downloadWithTag = requestDatabase.requestDao().getByFile(file)
+        val download = downloadWithTag?.download?.apply {
+            tags = downloadWithTag.tags.map { it.title }
+        }
         sanitize(download)
         return download
     }
@@ -181,8 +184,8 @@ class FetchDatabaseManagerImpl constructor(
     }
 
     override fun getDownloadsInGroupWithStatus(
-            groupId: Int,
-            statuses: List<Status>
+        groupId: Int,
+        statuses: List<Status>
     ): List<DownloadInfo> {
         throwExceptionIfClosed()
         var downloads = requestDatabase.requestDao().getByGroupWithStatus(groupId, statuses)
@@ -245,20 +248,20 @@ class FetchDatabaseManagerImpl constructor(
     }
 
     private val pendingCountQuery =
-            "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
-                    " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
-                    " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'"
+        "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
+                " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
+                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'"
 
     private val pendingCountIncludeAddedQuery =
-            "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
-                    " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
-                    " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'" +
-                    " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.ADDED.value}'"
+        "SELECT ${DownloadDatabase.COLUMN_ID} FROM ${DownloadDatabase.TABLE_NAME}" +
+                " WHERE ${DownloadDatabase.COLUMN_STATUS} = '${Status.QUEUED.value}'" +
+                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.DOWNLOADING.value}'" +
+                " OR ${DownloadDatabase.COLUMN_STATUS} = '${Status.ADDED.value}'"
 
     override fun getPendingCount(includeAddedDownloads: Boolean): Long {
         return try {
             val query =
-                    if (includeAddedDownloads) pendingCountIncludeAddedQuery else pendingCountQuery
+                if (includeAddedDownloads) pendingCountIncludeAddedQuery else pendingCountQuery
             val cursor: Cursor? = database.query(query)
             val count = cursor?.count?.toLong() ?: -1L
             cursor?.close()
@@ -328,11 +331,11 @@ class FetchDatabaseManagerImpl constructor(
     private fun onDownloading(downloadInfo: DownloadInfo, firstEntry: Boolean) {
         if (firstEntry) {
             val status =
-                    if (downloadInfo.downloaded > 0 && downloadInfo.total > 0 && downloadInfo.downloaded >= downloadInfo.total) {
-                        Status.COMPLETED
-                    } else {
-                        Status.QUEUED
-                    }
+                if (downloadInfo.downloaded > 0 && downloadInfo.total > 0 && downloadInfo.downloaded >= downloadInfo.total) {
+                    Status.COMPLETED
+                } else {
+                    Status.QUEUED
+                }
             downloadInfo.status = status
             downloadInfo.error = defaultNoError
             updatedDownloadsList.add(downloadInfo)
