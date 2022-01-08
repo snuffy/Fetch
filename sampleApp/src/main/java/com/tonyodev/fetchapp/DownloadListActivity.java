@@ -4,31 +4,29 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.tonyodev.fetch2.AbstractFetchListener;
-import com.tonyodev.fetch2.DefaultFetchNotificationManager;
 import com.tonyodev.fetch2.Download;
 import com.tonyodev.fetch2.Error;
-import com.tonyodev.fetch2core.Downloader;
 import com.tonyodev.fetch2.Fetch;
+import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.FetchListener;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2.Request;
-import com.tonyodev.fetch2.FetchConfiguration;
+import com.tonyodev.fetch2core.Downloader;
 import com.tonyodev.fetch2okhttp.OkHttpDownloader;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 
 import java.util.ArrayList;
 import java.util.Collections;

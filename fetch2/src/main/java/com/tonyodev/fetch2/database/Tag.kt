@@ -14,4 +14,11 @@ data class Tag(
         @ColumnInfo(name = DownloadDatabase.COLUMN_TITLE,
                 typeAffinity = ColumnInfo.TEXT)
         val title: String
-)
+) {
+    companion object {
+        fun generateId(tag: String): Int {
+            val rawId = tag.trim().lowercase()
+            return (rawId.hashCode() and 0xfffffff)
+        }
+    }
+}

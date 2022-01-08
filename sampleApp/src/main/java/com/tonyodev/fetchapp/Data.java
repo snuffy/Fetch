@@ -3,6 +3,7 @@ package com.tonyodev.fetchapp;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
+
 import androidx.annotation.NonNull;
 
 import com.tonyodev.fetch2.Priority;
@@ -39,7 +40,10 @@ public final class Data {
     @NonNull
     public static List<Request> getFetchRequestWithGroupId(final int groupId, Context context) {
         final List<Request> requests = getFetchRequests(context);
+        ArrayList<String> tags = new ArrayList<>();
+        tags.add("bookmark-1");
         for (Request request : requests) {
+            request.setTags(tags);
             request.setGroupId(groupId);
         }
         return requests;
