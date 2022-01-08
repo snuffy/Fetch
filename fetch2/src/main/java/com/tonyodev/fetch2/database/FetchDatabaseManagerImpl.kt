@@ -234,7 +234,8 @@ class FetchDatabaseManagerImpl constructor(
         }
 
         tags.map {
-            val tagId = (it.hashCode() and 0xfffffff)
+            val rawId = it.trim().lowercase()
+            val tagId = (rawId.hashCode() and 0xfffffff)
             val tag = Tag(tagId, it)
             val tagRef = TagRef(tag.id, info.id)
             requestDatabase.tagDao().addOrUpdateTag(tag)
