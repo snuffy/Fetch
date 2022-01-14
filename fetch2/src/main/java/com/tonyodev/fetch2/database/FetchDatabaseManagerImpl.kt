@@ -206,15 +206,21 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getPendingDownloadsSorted(prioritySort: PrioritySort): List<DownloadInfo> {
         throwExceptionIfClosed()
-        var downloads = if (prioritySort == PrioritySort.ASC) {
+        val downloads = if (prioritySort == PrioritySort.ASC) {
             requestDatabase.requestDao().getPendingDownloadsSorted(Status.QUEUED)
         } else {
             requestDatabase.requestDao().getPendingDownloadsSortedDesc(Status.QUEUED)
         }
-        if (sanitize(downloads)) {
-            downloads = downloads.filter { it.status == Status.QUEUED }
+        var downloadsWrappers: List<DownloadInfo> = downloads.map {
+            it.download.apply {
+                tags = it.tags.map { t -> t.title }
+            }
+            return@map it.download
         }
-        return downloads
+        if (sanitize(downloadsWrappers)) {
+            downloadsWrappers = downloadsWrappers.filter { it.status == Status.QUEUED }
+        }
+        return downloadsWrappers
     }
 
     override fun getAllGroupIds(): List<Int> {
@@ -224,7 +230,6 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getDownloadsByTag(tag: String): List<DownloadInfo> {
         throwExceptionIfClosed()
-
         val tagId = Tag.generateId(tag)
         val downloadsAndTag = requestDatabase.tagDao().getDownloadsByTag(tagId)
         val downloads = downloadsAndTag?.downloads ?: emptyList()

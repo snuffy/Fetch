@@ -12,6 +12,7 @@ import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_STATUS
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_TAG
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.TABLE_NAME
 import com.tonyodev.fetch2.database.join.DownloadWithTags
+import com.tonyodev.fetch2.database.join.TagWithDownloads
 import com.tonyodev.fetch2.database.models.ExtraUpdater
 
 
@@ -67,10 +68,10 @@ interface DownloadDao {
     fun getByGroupWithStatus(group: Int, statuses: List<@JvmSuppressWildcards Status>): List<DownloadInfo>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_STATUS = :status ORDER BY $COLUMN_PRIORITY DESC, $COLUMN_CREATED ASC")
-    fun getPendingDownloadsSorted(status: Status): List<DownloadInfo>
+    fun getPendingDownloadsSorted(status: Status): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_STATUS = :status ORDER BY $COLUMN_PRIORITY DESC, $COLUMN_CREATED DESC")
-    fun getPendingDownloadsSortedDesc(status: Status): List<DownloadInfo>
+    fun getPendingDownloadsSortedDesc(status: Status): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_IDENTIFIER = :identifier")
     fun getDownloadsByRequestIdentifier(identifier: Long): List<DownloadInfo>
