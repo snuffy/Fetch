@@ -15,9 +15,14 @@ import com.tonyodev.fetch2core.getFileUri
 import java.util.*
 
 
-@Entity(tableName = DownloadDatabase.TABLE_NAME,
-        indices = [(Index(value = [DownloadDatabase.COLUMN_FILE], unique = true)),
-            (Index(value = [DownloadDatabase.COLUMN_GROUP, DownloadDatabase.COLUMN_STATUS], unique = false))])
+@Entity(
+    tableName = DownloadDatabase.TABLE_NAME,
+    indices = [(Index(value = [DownloadDatabase.COLUMN_FILE], unique = true)),
+        (Index(
+            value = [DownloadDatabase.COLUMN_GROUP, DownloadDatabase.COLUMN_STATUS],
+            unique = false
+        ))]
+)
 open class DownloadInfo : Download {
 
     @PrimaryKey
@@ -72,16 +77,25 @@ open class DownloadInfo : Download {
     @ColumnInfo(name = DownloadDatabase.COLUMN_IDENTIFIER, typeAffinity = ColumnInfo.INTEGER)
     override var identifier: Long = DEFAULT_UNIQUE_IDENTIFIER
 
-    @ColumnInfo(name = DownloadDatabase.COLUMN_DOWNLOAD_ON_ENQUEUE, typeAffinity = ColumnInfo.INTEGER)
+    @ColumnInfo(
+        name = DownloadDatabase.COLUMN_DOWNLOAD_ON_ENQUEUE,
+        typeAffinity = ColumnInfo.INTEGER
+    )
     override var downloadOnEnqueue: Boolean = DEFAULT_DOWNLOAD_ON_ENQUEUE
 
     @ColumnInfo(name = DownloadDatabase.COLUMN_EXTRAS, typeAffinity = ColumnInfo.TEXT)
     override var extras: Extras = Extras.emptyExtras
 
-    @ColumnInfo(name = DownloadDatabase.COLUMN_AUTO_RETRY_MAX_ATTEMPTS, typeAffinity = ColumnInfo.INTEGER)
+    @ColumnInfo(
+        name = DownloadDatabase.COLUMN_AUTO_RETRY_MAX_ATTEMPTS,
+        typeAffinity = ColumnInfo.INTEGER
+    )
     override var autoRetryMaxAttempts: Int = DEFAULT_AUTO_RETRY_ATTEMPTS
 
-    @ColumnInfo(name = DownloadDatabase.COLUMN_AUTO_RETRY_ATTEMPTS, typeAffinity = ColumnInfo.INTEGER)
+    @ColumnInfo(
+        name = DownloadDatabase.COLUMN_AUTO_RETRY_ATTEMPTS,
+        typeAffinity = ColumnInfo.INTEGER
+    )
     override var autoRetryAttempts: Int = DEFAULT_AUTO_RETRY_ATTEMPTS
 
     @Ignore
@@ -117,6 +131,10 @@ open class DownloadInfo : Download {
 
     override fun copy(): Download {
         return this.toDownloadInfo(DownloadInfo())
+    }
+
+    override fun copy(download: Download.() -> Unit): Download {
+        return this.apply(download)
     }
 
     override fun equals(other: Any?): Boolean {
