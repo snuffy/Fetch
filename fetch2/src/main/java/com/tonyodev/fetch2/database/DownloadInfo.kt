@@ -133,7 +133,7 @@ open class DownloadInfo : Download {
         return this.toDownloadInfo(DownloadInfo())
     }
 
-    override fun copy(download: Download.() -> Unit): Download {
+    override fun copy(download: (DownloadInfo) -> Unit): Download {
         return this.apply(download)
     }
 

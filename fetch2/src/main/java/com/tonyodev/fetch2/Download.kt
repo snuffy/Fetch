@@ -2,6 +2,7 @@ package com.tonyodev.fetch2
 
 import android.net.Uri
 import android.os.Parcelable
+import com.tonyodev.fetch2.database.DownloadInfo
 import com.tonyodev.fetch2core.Extras
 import java.io.Serializable
 
@@ -76,7 +77,7 @@ interface Download : Parcelable, Serializable {
     fun copy(): Download
 
     /** Gets a copy of this instance. */
-    fun copy(download: Download.() -> Unit):Download
+    fun copy(download: (DownloadInfo) -> Unit):Download
 
     /** Gets the tag associated with this download.*/
     val tag: String?
