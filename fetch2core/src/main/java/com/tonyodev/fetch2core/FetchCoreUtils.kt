@@ -53,28 +53,33 @@ fun calculateProgress(downloaded: Long, total: Long): Int {
     }
 }
 
-fun calculateEstimatedTimeRemainingInMilliseconds(downloadedBytes: Long,
-                                                  totalBytes: Long,
-                                                  downloadedBytesPerSecond: Long): Long {
+fun calculateEstimatedTimeRemainingInMilliseconds(
+    downloadedBytes: Long,
+    totalBytes: Long,
+    downloadedBytesPerSecond: Long
+): Long {
     return when {
         totalBytes < 1 -> -1
         downloadedBytes < 1 -> -1
         downloadedBytesPerSecond < 1 -> -1
         else -> {
-            val seconds = (totalBytes - downloadedBytes).toDouble() / downloadedBytesPerSecond.toDouble()
+            val seconds =
+                (totalBytes - downloadedBytes).toDouble() / downloadedBytesPerSecond.toDouble()
             return abs(ceil(seconds)).toLong() * 1000
         }
     }
 }
 
-fun hasIntervalTimeElapsed(nanoStartTime: Long, nanoStopTime: Long,
-                           progressIntervalMilliseconds: Long): Boolean {
+fun hasIntervalTimeElapsed(
+    nanoStartTime: Long, nanoStopTime: Long,
+    progressIntervalMilliseconds: Long
+): Boolean {
     return TimeUnit.NANOSECONDS
-            .toMillis(nanoStopTime - nanoStartTime) >= progressIntervalMilliseconds
+        .toMillis(nanoStopTime - nanoStartTime) >= progressIntervalMilliseconds
 }
 
 fun getUniqueId(url: String, file: String): Int {
-    return (url.hashCode() * 31) + file.hashCode()
+    return url.plus(file).hashCode() and 0xfffffff
 }
 
 fun getIncrementedFileIfOriginalExists(originalPath: String): File {
@@ -252,8 +257,8 @@ fun isParallelDownloadingSupported(code: Int, headers: Map<String, List<String>>
 }
 
 fun getRequestSupportedFileDownloaderTypes(
-        request: Downloader.ServerRequest,
-        downloader: Downloader<*, *>
+    request: Downloader.ServerRequest,
+    downloader: Downloader<*, *>
 ): Set<Downloader.FileDownloaderType> {
     val fileDownloaderTypeSet = mutableSetOf(Downloader.FileDownloaderType.SEQUENTIAL)
     return try {
@@ -272,20 +277,20 @@ fun getRequestSupportedFileDownloaderTypes(
 
 @SuppressLint("DefaultLocale")
 fun acceptRanges(
-        code: Int,
-        headers: Map<String, List<String>>
+    code: Int,
+    headers: Map<String, List<String>>
 ): Boolean {
     val acceptRangeValue = getHeaderValue(
-            headers,
-            HEADER_ACCEPT_RANGE,
-            HEADER_ACCEPT_RANGE_LEGACY,
-            HEADER_ACCEPT_RANGE_COMPAT
+        headers,
+        HEADER_ACCEPT_RANGE,
+        HEADER_ACCEPT_RANGE_LEGACY,
+        HEADER_ACCEPT_RANGE_COMPAT
     )
     val transferValue = getHeaderValue(
-            headers,
-            HEADER_TRANSFER_ENCODING,
-            HEADER_TRANSFER_LEGACY,
-            HEADER_TRANSFER_ENCODING_COMPAT
+        headers,
+        HEADER_TRANSFER_ENCODING,
+        HEADER_TRANSFER_LEGACY,
+        HEADER_TRANSFER_ENCODING_COMPAT
     )
     val contentLength = getContentLengthFromHeader(headers, -1L)
     val acceptsRanges = code == HttpURLConnection.HTTP_PARTIAL || acceptRangeValue == "bytes"
@@ -294,10 +299,10 @@ fun acceptRanges(
 
 fun getContentLengthFromHeader(headers: Map<String, List<String>>, defaultValue: Long): Long {
     val contentRange = getHeaderValue(
-            headers,
-            HEADER_CONTENT_RANGE,
-            HEADER_CONTENT_RANGE_LEGACY,
-            HEADER_CONTENT_RANGE_COMPAT
+        headers,
+        HEADER_CONTENT_RANGE,
+        HEADER_CONTENT_RANGE_LEGACY,
+        HEADER_CONTENT_RANGE_COMPAT
     )
     val lastIndexOf = contentRange?.lastIndexOf("/")
     var contentLength = -1L
@@ -306,18 +311,18 @@ fun getContentLengthFromHeader(headers: Map<String, List<String>>, defaultValue:
     }
     if (contentLength == -1L) {
         contentLength = getHeaderValue(
-                headers,
-                HEADER_CONTENT_LENGTH,
-                HEADER_CONTENT_LENGTH_LEGACY,
-                HEADER_CONTENT_LENGTH_COMPAT
+            headers,
+            HEADER_CONTENT_LENGTH,
+            HEADER_CONTENT_LENGTH_LEGACY,
+            HEADER_CONTENT_LENGTH_COMPAT
         )?.toLongOrNull() ?: defaultValue
     }
     return contentLength
 }
 
 fun getHeaderValue(
-        headers: Map<String, List<String>>,
-        vararg keys: String
+    headers: Map<String, List<String>>,
+    vararg keys: String
 ): String? {
     for (key in keys) {
         val value = headers[key]?.firstOrNull()
@@ -343,8 +348,8 @@ fun getRequestContentLength(request: Downloader.ServerRequest, downloader: Downl
 }
 
 fun isUriPath(path: String): Boolean = path.takeIf { it.isNotEmpty() }
-        ?.let { it.startsWith("content://") || it.startsWith("file://") }
-        ?: false
+    ?.let { it.startsWith("content://") || it.startsWith("file://") }
+    ?: false
 
 fun getFileUri(path: String): Uri {
     return when {
@@ -362,8 +367,17 @@ fun renameFile(oldFile: File, newFile: File): Boolean {
 }
 
 fun copyDownloadResponseNoStream(response: Downloader.Response): Downloader.Response {
-    return Downloader.Response(response.code, response.isSuccessful, response.contentLength, null,
-            response.request, response.hash, response.responseHeaders, response.acceptsRanges, response.errorResponse)
+    return Downloader.Response(
+        response.code,
+        response.isSuccessful,
+        response.contentLength,
+        null,
+        response.request,
+        response.hash,
+        response.responseHeaders,
+        response.acceptsRanges,
+        response.errorResponse
+    )
 }
 
 fun getDefaultCookieManager(): CookieManager {
@@ -372,7 +386,11 @@ fun getDefaultCookieManager(): CookieManager {
     return cookieManager
 }
 
-fun hasAllowedTimeExpired(timeStartedMillis: Long, timeStopMillis: Long, allowedTimeMillis: Long): Boolean {
+fun hasAllowedTimeExpired(
+    timeStartedMillis: Long,
+    timeStopMillis: Long,
+    allowedTimeMillis: Long
+): Boolean {
     return timeStopMillis - timeStartedMillis >= allowedTimeMillis
 }
 
@@ -396,7 +414,7 @@ fun copyStreamToString(inputStream: InputStream?, closeStream: Boolean = true): 
             var line: String? = bufferedReader.readLine()
             while (line != null) {
                 stringBuilder.append(line)
-                        .append('\n')
+                    .append('\n')
                 line = bufferedReader.readLine()
             }
             stringBuilder.toString()
