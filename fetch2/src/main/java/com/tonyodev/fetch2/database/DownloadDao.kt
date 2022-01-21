@@ -9,10 +9,8 @@ import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_ID
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_IDENTIFIER
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_PRIORITY
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_STATUS
-import com.tonyodev.fetch2.database.DownloadDatabase.Companion.COLUMN_TAG
 import com.tonyodev.fetch2.database.DownloadDatabase.Companion.TABLE_NAME
 import com.tonyodev.fetch2.database.join.DownloadWithTags
-import com.tonyodev.fetch2.database.join.TagWithDownloads
 import com.tonyodev.fetch2.database.models.ExtraUpdater
 
 
@@ -44,28 +42,28 @@ interface DownloadDao {
     fun update(downloadInfoList: List<DownloadInfo>)
 
     @Query("SELECT * FROM $TABLE_NAME")
-    fun get(): List<DownloadInfo>
+    fun get(): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID = :id")
     fun get(id: Int): DownloadInfo?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID IN (:ids)")
-    fun get(ids: List<Int>): List<DownloadInfo>
+    fun get(ids: List<Int>): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_FILE = :file")
     fun getByFile(file: String): DownloadWithTags?
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_STATUS = :status")
-    fun getByStatus(status: Status): List<DownloadInfo>
+    fun getByStatus(status: Status): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_STATUS IN (:statuses)")
-    fun getByStatus(statuses: List<@JvmSuppressWildcards Status>): List<DownloadInfo>
+    fun getByStatus(statuses: List<@JvmSuppressWildcards Status>): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_GROUP = :group")
-    fun getByGroup(group: Int): List<DownloadInfo>
+    fun getByGroup(group: Int): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_GROUP = :group AND $COLUMN_STATUS IN (:statuses)")
-    fun getByGroupWithStatus(group: Int, statuses: List<@JvmSuppressWildcards Status>): List<DownloadInfo>
+    fun getByGroupWithStatus(group: Int, statuses: List<@JvmSuppressWildcards Status>): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_STATUS = :status ORDER BY $COLUMN_PRIORITY DESC, $COLUMN_CREATED ASC")
     fun getPendingDownloadsSorted(status: Status): List<DownloadWithTags>
@@ -74,10 +72,7 @@ interface DownloadDao {
     fun getPendingDownloadsSortedDesc(status: Status): List<DownloadWithTags>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_IDENTIFIER = :identifier")
-    fun getDownloadsByRequestIdentifier(identifier: Long): List<DownloadInfo>
-
-    @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_TAG = :tag")
-    fun getDownloadsByTag(tag: String): List<DownloadInfo>
+    fun getDownloadsByRequestIdentifier(identifier: Long): List<DownloadWithTags>
 
     @Query("SELECT DISTINCT $COLUMN_GROUP from $TABLE_NAME")
     fun getAllGroupIds(): List<Int>

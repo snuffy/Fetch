@@ -129,7 +129,10 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun get(): List<DownloadInfo> {
         throwExceptionIfClosed()
-        val downloads = requestDatabase.requestDao().get()
+        val downloadsWithTags = requestDatabase.requestDao().get()
+        val downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         sanitize(downloads)
         return downloads
     }
@@ -143,7 +146,10 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun get(ids: List<Int>): List<DownloadInfo?> {
         throwExceptionIfClosed()
-        val downloads = requestDatabase.requestDao().get(ids)
+        val downloadsWithTags = requestDatabase.requestDao().get(ids)
+        val downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         sanitize(downloads)
         return downloads
     }
@@ -160,7 +166,10 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getByStatus(status: Status): List<DownloadInfo> {
         throwExceptionIfClosed()
-        var downloads = requestDatabase.requestDao().getByStatus(status)
+        val downloadsWithTags = requestDatabase.requestDao().getByStatus(status)
+        var downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         if (sanitize(downloads)) {
             downloads = downloads.filter { it.status == status }
         }
@@ -169,7 +178,10 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getByStatus(statuses: List<Status>): List<DownloadInfo> {
         throwExceptionIfClosed()
-        var downloads = requestDatabase.requestDao().getByStatus(statuses)
+        val downloadsWithTags = requestDatabase.requestDao().getByStatus(statuses)
+        var downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         if (sanitize(downloads)) {
             downloads = downloads.filter { statuses.contains(it.status) }
         }
@@ -178,7 +190,10 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getByGroup(group: Int): List<DownloadInfo> {
         throwExceptionIfClosed()
-        val downloads = requestDatabase.requestDao().getByGroup(group)
+        val downloadsWithTags = requestDatabase.requestDao().getByGroup(group)
+        val downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         sanitize(downloads)
         return downloads
     }
@@ -188,7 +203,10 @@ class FetchDatabaseManagerImpl constructor(
         statuses: List<Status>
     ): List<DownloadInfo> {
         throwExceptionIfClosed()
-        var downloads = requestDatabase.requestDao().getByGroupWithStatus(groupId, statuses)
+        val downloadsWithTags = requestDatabase.requestDao().getByGroupWithStatus(groupId, statuses)
+        var downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         if (sanitize(downloads)) {
             downloads = downloads.filter { download ->
                 statuses.any { it == download.status }
@@ -199,7 +217,11 @@ class FetchDatabaseManagerImpl constructor(
 
     override fun getDownloadsByRequestIdentifier(identifier: Long): List<DownloadInfo> {
         throwExceptionIfClosed()
-        val downloads = requestDatabase.requestDao().getDownloadsByRequestIdentifier(identifier)
+        val downloadsWithTags = requestDatabase.requestDao()
+            .getDownloadsByRequestIdentifier(identifier)
+        val downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
         sanitize(downloads)
         return downloads
     }
