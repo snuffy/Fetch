@@ -283,6 +283,10 @@ class FetchHandlerImpl(
         return resumeDownloads(fetchDatabaseManagerWrapper.getByGroup(id).map { it.id })
     }
 
+    override fun updatePriority(ids: List<Int>, priority: Priority): List<Download> {
+        return fetchDatabaseManagerWrapper.updatePriority(ids, priority)
+    }
+
     private fun resumeDownloads(downloadIds: List<Int>): List<Download> {
         val downloads = fetchDatabaseManagerWrapper.get(downloadIds).filterNotNull()
         val resumedDownloads = mutableListOf<DownloadInfo>()
@@ -504,6 +508,7 @@ class FetchHandlerImpl(
         }
     }
 
+
     override fun getDownloads(): List<Download> {
         return fetchDatabaseManagerWrapper.get()
     }
@@ -522,6 +527,10 @@ class FetchHandlerImpl(
 
     override fun getDownloadsInGroup(id: Int): List<Download> {
         return fetchDatabaseManagerWrapper.getByGroup(id)
+    }
+
+    override fun getDownloadsInGroups(ids: List<Int>): List<Download> {
+        return fetchDatabaseManagerWrapper.getByGroups(ids)
     }
 
     override fun getDownloadsWithStatus(status: Status): List<Download> {

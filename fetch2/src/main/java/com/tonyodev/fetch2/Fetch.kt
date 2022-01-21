@@ -650,6 +650,23 @@ interface Fetch {
         func2: Func<Error>? = null
     ): Fetch
 
+    /** Updates priority an existing downloads.
+     * @see com.tonyodev.fetch2.Request for more details.
+     * @param ids Id of existing download
+     * @param priority priority level
+     * @param notifyListeners If the request is successfully updated notify attached Fetch listeners of the download status. Default true
+     * @param func Successful callback that the download will be returned on.
+     * @param func2 Failed callback that the error will be returned on.
+     * @throws FetchException if this instance of Fetch has been closed.
+     * @return Instance
+     * */
+    fun updateDownloadsPriority(
+        ids: List<Int>,
+        priority: Priority,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch
+
     /** Replaces the existing extras object associated with an existing download/request with the newly passed in extras object.
      * @param id Id of existing request/download
      * @param extras new extras object
@@ -743,6 +760,15 @@ interface Fetch {
      * @return Instance
      * */
     fun getDownloadsInGroup(groupId: Int, func: Func<List<Download>>): Fetch
+
+    /**
+     * Gets all downloads in the specified group.
+     * @param groupIds group id to query.
+     * @param func Callback that the results will be returned on.
+     * @throws FetchException if this instance of Fetch has been closed.
+     * @return Instance
+     * */
+    fun getDownloadsInGroups(groupIds: List<Int>, func: Func<List<Download>>): Fetch
 
     /**
      * Gets all downloads with a specific status.

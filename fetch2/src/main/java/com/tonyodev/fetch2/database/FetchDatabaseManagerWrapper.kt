@@ -1,11 +1,14 @@
 package com.tonyodev.fetch2.database
 
+import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Priority
 import com.tonyodev.fetch2.PrioritySort
 import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2core.Extras
 import com.tonyodev.fetch2core.Logger
 
-class FetchDatabaseManagerWrapper(private val fetchDatabaseManager: FetchDatabaseManager<DownloadInfo>): FetchDatabaseManager<DownloadInfo> {
+class FetchDatabaseManagerWrapper(private val fetchDatabaseManager: FetchDatabaseManager<DownloadInfo>) :
+    FetchDatabaseManager<DownloadInfo> {
 
     override val logger: Logger = fetchDatabaseManager.logger
     private val lock = Any()
@@ -119,6 +122,12 @@ class FetchDatabaseManagerWrapper(private val fetchDatabaseManager: FetchDatabas
         }
     }
 
+    override fun getByGroups(ids: List<Int>): List<DownloadInfo> {
+        return synchronized(lock) {
+            fetchDatabaseManager.getByGroups(ids)
+        }
+    }
+
     override fun getAllGroupIds(): List<Int> {
         return synchronized(lock) {
             fetchDatabaseManager.getAllGroupIds()
@@ -131,7 +140,10 @@ class FetchDatabaseManagerWrapper(private val fetchDatabaseManager: FetchDatabas
         }
     }
 
-    override fun getDownloadsInGroupWithStatus(groupId: Int, statuses: List<Status>): List<DownloadInfo> {
+    override fun getDownloadsInGroupWithStatus(
+        groupId: Int,
+        statuses: List<Status>
+    ): List<DownloadInfo> {
         return synchronized(lock) {
             fetchDatabaseManager.getDownloadsInGroupWithStatus(groupId, statuses)
         }
@@ -150,15 +162,21 @@ class FetchDatabaseManagerWrapper(private val fetchDatabaseManager: FetchDatabas
     }
 
     override fun sanitizeOnFirstEntry() {
-       synchronized(lock) {
-           fetchDatabaseManager.sanitizeOnFirstEntry()
-       }
+        synchronized(lock) {
+            fetchDatabaseManager.sanitizeOnFirstEntry()
+        }
     }
 
     override fun updateExtras(id: Int, extras: Extras): DownloadInfo? {
-       return synchronized(lock) {
-           fetchDatabaseManager.updateExtras(id, extras)
-       }
+        return synchronized(lock) {
+            fetchDatabaseManager.updateExtras(id, extras)
+        }
+    }
+
+    override fun updatePriority(ids: List<Int>, priority: Priority): List<Download> {
+        return synchronized(lock) {
+            fetchDatabaseManager.updatePriority(ids, priority)
+        }
     }
 
     override fun getPendingCount(includeAddedDownloads: Boolean): Long {

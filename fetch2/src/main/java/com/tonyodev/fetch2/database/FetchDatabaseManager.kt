@@ -1,5 +1,7 @@
 package com.tonyodev.fetch2.database
 
+import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Priority
 import com.tonyodev.fetch2.PrioritySort
 import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2core.Extras
@@ -11,16 +13,18 @@ import java.io.Closeable
  * The default Fetch Database Manager is FetchDatabaseManagerImpl which uses sqlite/room
  * to store download information. All methods and fields will be called on Fetch's background thread.
  * */
-interface FetchDatabaseManager<T: DownloadInfo> : Closeable {
+interface FetchDatabaseManager<T : DownloadInfo> : Closeable {
 
     /**
      * Checks if the database is closed.
      * */
     val isClosed: Boolean
+
     /**
      * Logger to be used
      * */
     val logger: Logger
+
     /**
      * Delegate used by Fetch to delete temporary files used to assist the parallel downloader.
      * This field is set by the Fetch Builder directly. Your implemention should set this to null
@@ -57,8 +61,8 @@ interface FetchDatabaseManager<T: DownloadInfo> : Closeable {
     fun delete(downloadInfoList: List<T>)
 
     /**
-    * Deletes all downloads in the database.
-    * */
+     * Deletes all downloads in the database.
+     * */
     fun deleteAll()
 
     /**
@@ -127,6 +131,8 @@ interface FetchDatabaseManager<T: DownloadInfo> : Closeable {
      * */
     fun getByGroup(group: Int): List<T>
 
+    fun getByGroups(ids: List<Int>): List<T>
+
     /**
      * Gets all downloads in the specified group with the specified statuses.
      * @param groupId the group id
@@ -178,6 +184,13 @@ interface FetchDatabaseManager<T: DownloadInfo> : Closeable {
     fun updateExtras(id: Int, extras: Extras): T?
 
     /**
+     * Updates the priority on a downloads.
+     * @param ids the download id.
+     * @param priority the new priority that will replace the existing priority on the download.
+     * */
+    fun updatePriority(ids: List<Int>, priority: Priority): List<Download>
+
+    /**
      * Gets the count/sum of all downloads with the status of Queued and Downloading combined.
      * @param includeAddedDownloads if to include downloads with the status of Added.
      * Added downloads are not considered pending by default.
@@ -194,7 +207,7 @@ interface FetchDatabaseManager<T: DownloadInfo> : Closeable {
     /**
      * Interface used for the DownloadManager's delegate.
      * */
-    interface Delegate<T: DownloadInfo> {
+    interface Delegate<T : DownloadInfo> {
 
         /**
          * Deletes all associated temp files used to perform a download for a download.

@@ -906,6 +906,37 @@ open class FetchImpl constructor(
         }
     }
 
+    override fun updateDownloadsPriority(
+        ids: List<Int>,
+        priority: Priority,
+        func: Func<List<Download>>?,
+        func2: Func<Error>?
+    ): Fetch {
+        return synchronized(lock) {
+            throwExceptionIfClosed()
+            handlerWrapper.post {
+                try {
+                    val downloads = fetchHandler.updatePriority(ids, priority)
+                    if (func != null) {
+                        uiHandler.post {
+                            func.call(downloads)
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.e("Failed to update priority on downloads: ", e)
+                    val error = getErrorFromMessage(e.message)
+                    error.throwable = e
+                    if (func2 != null) {
+                        uiHandler.post {
+                            func2.call(error)
+                        }
+                    }
+                }
+            }
+            this
+        }
+    }
+
     override fun getDownloads(func: Func<List<Download>>): Fetch {
         return synchronized(lock) {
             throwExceptionIfClosed()
@@ -963,6 +994,19 @@ open class FetchImpl constructor(
             throwExceptionIfClosed()
             handlerWrapper.post {
                 val downloads = fetchHandler.getDownloadsInGroup(groupId)
+                uiHandler.post {
+                    func.call(downloads)
+                }
+            }
+            return this
+        }
+    }
+
+    override fun getDownloadsInGroups(groupIds: List<Int>, func: Func<List<Download>>): Fetch {
+        synchronized(lock) {
+            throwExceptionIfClosed()
+            handlerWrapper.post {
+                val downloads = fetchHandler.getDownloadsInGroups(groupIds)
                 uiHandler.post {
                     func.call(downloads)
                 }

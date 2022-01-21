@@ -21,6 +21,7 @@ interface FetchHandler : Closeable {
     fun pauseAll(): List<Download>
     fun freeze()
     fun unfreeze()
+    fun updatePriority(ids: List<Int>, priority: Priority): List<Download>
     fun resume(ids: List<Int>): List<Download>
     fun resumeGroup(id: Int): List<Download>
     fun resumeAll(): List<Download>
@@ -44,6 +45,7 @@ interface FetchHandler : Closeable {
     fun getDownloadByFile(file: String): Download?
     fun getDownloads(idList: List<Int>): List<Download>
     fun getDownloadsInGroup(id: Int): List<Download>
+    fun getDownloadsInGroups(ids: List<Int>): List<Download>
     fun getDownloadsWithStatus(status: Status): List<Download>
     fun getAllGroupIds(): List<Int>
     fun getDownloadsByTag(tag: String): List<Download>

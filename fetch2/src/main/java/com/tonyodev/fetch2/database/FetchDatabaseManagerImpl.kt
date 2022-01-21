@@ -6,6 +6,8 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteException
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Priority
 import com.tonyodev.fetch2.PrioritySort
 import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2.database.migration.Migration
@@ -127,6 +129,15 @@ class FetchDatabaseManagerImpl constructor(
         return download
     }
 
+    override fun updatePriority(ids: List<Int>, priority: Priority): List<Download> {
+        throwExceptionIfClosed()
+        val downloads = requestDatabase.requestDao().get(ids).map {
+            it.download.apply { this.priority = priority }
+        }.also { update(it) }
+
+        return downloads
+    }
+
     override fun get(): List<DownloadInfo> {
         throwExceptionIfClosed()
         val downloadsWithTags = requestDatabase.requestDao().get()
@@ -191,6 +202,16 @@ class FetchDatabaseManagerImpl constructor(
     override fun getByGroup(group: Int): List<DownloadInfo> {
         throwExceptionIfClosed()
         val downloadsWithTags = requestDatabase.requestDao().getByGroup(group)
+        val downloads = downloadsWithTags.map {
+            it.download.apply { tags = it.tags.map { tag -> tag.title } }
+        }
+        sanitize(downloads)
+        return downloads
+    }
+
+    override fun getByGroups(ids: List<Int>): List<DownloadInfo> {
+        throwExceptionIfClosed()
+        val downloadsWithTags = requestDatabase.requestDao().getByGroups(ids)
         val downloads = downloadsWithTags.map {
             it.download.apply { tags = it.tags.map { tag -> tag.title } }
         }
