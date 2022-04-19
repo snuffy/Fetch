@@ -41,7 +41,7 @@ class FetchDatabaseManagerImpl constructor(
     private val database: SupportSQLiteDatabase
 
     init {
-        val builder = Room.databaseBuilder(context, DownloadDatabase::class.java, "$namespace.db")
+        val builder = Room.databaseBuilder(context, DownloadDatabase::class.java, "$namespace.db").fallbackToDestructiveMigration()
         builder.addMigrations(*migrations)
         requestDatabase = builder.build()
         database = requestDatabase.openHelper.writableDatabase
